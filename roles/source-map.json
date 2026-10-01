@@ -51,16 +51,12 @@
     "test_market_scheduler.py": "test_market_scheduler.py",
     "test_role_support.py": "test_role_support.py",
     "tests/collector_replay_fixture.py": "tests/collector_replay_fixture.py",
-    "tests/fixtures/btc_evidence_v1/missing.json": "tests/fixtures/btc_evidence_v1/missing.json",
-    "tests/fixtures/btc_evidence_v1/missing.txt": "tests/fixtures/btc_evidence_v1/missing.txt",
-    "tests/fixtures/btc_evidence_v1/telegram_updates.json": "tests/fixtures/btc_evidence_v1/telegram_updates.json",
-    "tests/fixtures/btc_evidence_v1/valid.json": "tests/fixtures/btc_evidence_v1/valid.json",
-    "tests/fixtures/btc_evidence_v1/valid.txt": "tests/fixtures/btc_evidence_v1/valid.txt",
     "AGENTS.md": "AGENTS.md",
     "README.md": "README.md",
     "requirements.txt": "requirements.txt",
     "collector_v2_reader.py": "collector_v2_reader.py",
-    "market_reader.py": "market_reader.py"
+    "market_reader.py": "market_reader.py",
+    "roles/build_test_fixtures.py": "roles/build_test_fixtures.py"
   },
   "analysis": {
     "roles/ANALYSIS_DEPLOYMENT.md": "analysis/roles/ANALYSIS_DEPLOYMENT.md",
@@ -72,7 +68,6 @@
     "roles/machine-analysis.example.json": "analysis/roles/machine-analysis.example.json",
     "roles/role_support.py": "roles/role_support.py",
     "roles/run_isolated_tests.py": "analysis/roles/run_isolated_tests.py",
-    "roles/tests/synthetic-analysis.json": "analysis/roles/tests/synthetic-analysis.json",
     "roles/tests/test_analysis_role.py": "analysis/roles/tests/test_analysis_role.py",
     "roles/verify_analysis_reference.py": "analysis/roles/verify_analysis_reference.py",
     "telegram_reader/README.md": "analysis/telegram_reader/README.md",
@@ -100,11 +95,6 @@
     "telegram_reader/test_btc_evidence.py": "test_btc_evidence.py",
     "telegram_reader/test_btc_evidence_reader.py": "test_btc_evidence_reader.py",
     "telegram_reader/tests/collector_replay_fixture.py": "analysis/telegram_reader/tests/collector_replay_fixture.py",
-    "telegram_reader/tests/fixtures/btc_evidence_v1/missing.json": "analysis/telegram_reader/tests/fixtures/btc_evidence_v1/missing.json",
-    "telegram_reader/tests/fixtures/btc_evidence_v1/missing.txt": "analysis/telegram_reader/tests/fixtures/btc_evidence_v1/missing.txt",
-    "telegram_reader/tests/fixtures/btc_evidence_v1/telegram_updates.json": "analysis/telegram_reader/tests/fixtures/btc_evidence_v1/telegram_updates.json",
-    "telegram_reader/tests/fixtures/btc_evidence_v1/valid.json": "analysis/telegram_reader/tests/fixtures/btc_evidence_v1/valid.json",
-    "telegram_reader/tests/fixtures/btc_evidence_v1/valid.txt": "analysis/telegram_reader/tests/fixtures/btc_evidence_v1/valid.txt",
     "telegram_reader/tests/reader_replay_fixture.py": "analysis/telegram_reader/tests/reader_replay_fixture.py",
     "telegram_reader/tests/test_bot_client.py": "analysis/telegram_reader/tests/test_bot_client.py",
     "telegram_reader/tests/test_collector_cli.py": "analysis/telegram_reader/tests/test_collector_cli.py",
@@ -117,6 +107,8 @@
     "telegram_reader/tests/test_evidence_v2.py": "analysis/telegram_reader/tests/test_evidence_v2.py",
     "telegram_reader/tests/test_security.py": "analysis/telegram_reader/tests/test_security.py",
     "telegram_reader/tests/test_store.py": "analysis/telegram_reader/tests/test_store.py",
-    "telegram_reader/tests/test_sync_engine.py": "analysis/telegram_reader/tests/test_sync_engine.py"
+    "telegram_reader/tests/test_sync_engine.py": "analysis/telegram_reader/tests/test_sync_engine.py",
+    "roles/generate_synthetic.py": "analysis/roles/generate_synthetic.py",
+    "telegram_reader/build_test_fixtures.py": "roles/build_test_fixtures.py"
   }
 }

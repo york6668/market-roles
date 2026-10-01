@@ -13,7 +13,7 @@
 | reader 证据展示 | `/Users/york/Library/Application Support/btc-telegram-reader/策略证据.md` |
 | reader 调度 | `local.btc.telegram-reader`，每小时第 10 分钟 |
 | 策略入口 | `/Users/york/.agents/skills/btc-core-strategy/scripts/strategy_v4.py`，生产 `/usr/bin/python3` |
-| 当前方法 | 同一 Skill 的 `SKILL.md` 和 `references/`，revision 5 |
+| 当前方法 | 同一 Skill 的 `SKILL.md` 和 `references/`，内容 revision 6（旧记录兼容读取） |
 | 个人事实 | 项目 `资产配置.md`、`操作记录.md`、`纠正记录.md` |
 | 策略状态 | 项目 `.strategy/`；正式 Owner 为 `.strategy/v4/current` |
 | 模型调度 | 原 `BTC核心策略自动重评`（id `btc`），本地小时任务，Sol/high，按需 Astra/max |
@@ -27,7 +27,7 @@
 
 `analysis-contract.json` 不包含机器路径。`machine-analysis.example.json` 是本机路径示例，没有凭据值。重建时修改自己的机器配置；`project_dir`、`skill_dir`、reader 数据与证据位置相互独立。`python` 用于本机工具及 reader 候选服务，可选择已安装 keyring 的 reader venv；策略生产入口仍使用该机选定的 `/usr/bin/python3`。不同 Python 的浮点求和不能改写冻结原始字节，必要时将实际可用的兼容解释器填入 `frozen_market_python`。
 
-参考 JSON 格式为 `market-role-source-v1`，`role=analysis`。源码按显式文件表选择；排除 `.strategy`、数据库、日志、真实市场附件、个人事实文件、凭据、Codex 登录、自动任务 memory/history、旧真实报告 fixture 和 rollback 资料。`roles/tests/synthetic-analysis.json` 是标明 2030 年的合成测试状态，不能装成真实策略。
+参考 JSON 格式为 `market-role-source-v1`，`role=analysis`。源码按显式文件表选择；排除 `.strategy`、数据库、日志、真实市场附件、个人事实文件、凭据、Codex 登录、自动任务 memory/history、旧真实报告 fixture 和 rollback 资料。合成测试状态由 `roles/generate_synthetic.py` 调用核心构造程序在临时目录生成，不随源码保存或导出。
 
 优先从指定 Git 提交导出，只写新目录，既不安装服务，也不开始分析或发送：
 
@@ -35,7 +35,7 @@
 python3 roles/export_role.py analysis /absolute/new/reference
 ```
 
-参考布局为 `telegram_reader/`、`skill/btc-core-strategy/`、`project-methods/`、`roles/`。可将当前 Skill 放入本机用户 skills 目录，或先通过本机配置指向参考目录做验证。方法引用相对实际 Skill 位置生成。兼容的 revision 3/4 代码用于读取原记录，当前新写入规则仍由原正式 `write-policy.json` 与 revision 5 方法拥有，不从旧 fixture、rollback 或历史模板恢复规则。
+参考布局为 `telegram_reader/`、`skill/btc-core-strategy/`、`project-methods/`、`roles/`。可将当前 Skill 放入本机用户 skills 目录，或先通过本机配置指向参考目录做验证。方法引用相对实际 Skill 位置生成。内容 revision 1–5 原样兼容读取，新运行按 revision 6 方法准备；正式状态只有经过实际评估与采纳才进入新内容版本。保留原 `write-policy.json` 和运行上下文，不从旧叙述、rollback 或历史模板补造配置决定。
 
 只读检查与真实策略入口：
 
@@ -111,7 +111,7 @@ helper 保留状态根内部链接并将绝对内部链接规范为相对链接�
 
 修复让每个标的最新报告的待下载附件优先进入同一个 20 件有界预算，其余待办保留并继续按原顺序处理；失败重试时间不绕过，来源质量不放宽。reader gap 导出含正文/附件身份和下载状态，策略冻结保留必要 report/bundle/transport 身份，排除 file_id、chat_id、采集 prose；身份不能提升事实可信度。VOO 的代理关系、UNKNOWN 复权与质量缺口不修成可分析。
 
-离线验收使用合成数据和临时目录，禁真实网络、凭据、发送和生产调度。通过参考包解包后运行 `roles/verify_analysis_reference.py`；它分别验证 reader、身份冻结和真实策略入口，包含 revision 5 market→observe、同一观察恢复、SQLite/WAL、内部链接、游标、研究待办和 PENDING/UNKNOWN/DELIVERED 保留。结果只证明源码与恢复接口；实际模型判断、真实发送、云端发布和自然小时运行各自需要实际证据。
+离线验收使用合成数据和临时目录，禁真实网络、凭据、发送和生产调度。通过参考包解包后运行 `roles/verify_analysis_reference.py`；它分别验证 reader、身份冻结和真实策略入口，包含 revision 6 market→observe 与 revision 5 正式状态保留、同一观察恢复、SQLite/WAL、内部链接、游标、研究待办和 PENDING/UNKNOWN/DELIVERED 保留。结果只证明源码与恢复接口；实际模型判断、真实发送、云端发布和自然小时运行各自需要实际证据。
 
 ## 独立核心发布
 

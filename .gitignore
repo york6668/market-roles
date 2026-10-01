@@ -2,3 +2,9 @@ __pycache__/
 *.py[cod]
 .DS_Store
 .venv/
+
+# Legacy local test snapshot; new scenarios are generated in temporary directories.
+/analysis/roles/tests/synthetic-analysis.json
+
+/tests/fixtures/
+/analysis/telegram_reader/tests/fixtures/

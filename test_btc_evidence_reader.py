@@ -150,7 +150,7 @@ class LatestObservations(unittest.TestCase):
             self.path, -9001, {7001},
             clock=lambda: 1788451200)
         self.addCleanup(self.reader.close)
-        fixtures = Path(__file__).parent / "tests" / "fixtures" / "btc_evidence_v1"
+        fixtures = Path(__import__('os').environ['BTC_READER_TEST_FIXTURE_DIR'])
         self.base = json.loads((fixtures / "valid.json").read_text())
         self.text = (fixtures / "valid.txt").read_text()
         self.update_id = 0

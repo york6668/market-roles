@@ -34,7 +34,7 @@ python3 -B roles/export_role.py collector /absolute/new/collector-source
 python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 ```
 
-目标目录必须不存在。导出只包含列明的源码、方法资料、配置样例和合成测试，不包含运行状态。安装 reader、Skill 或 collector 时使用相应部署说明，不整目录覆盖正在运行的代码和状态。`project-methods/` 提供分析目标项目的业务约定模板；实际账户事实仍只来自目标机器的本地文件。
+目标目录必须不存在。导出只包含列明的源码、方法资料、配置样例、测试程序与样本构造逻辑；合成测试数据在临时目录生成，不导出数据文件或运行状态。安装 reader、Skill 或 collector 时使用相应部署说明，不整目录覆盖正在运行的代码和状态。`project-methods/` 提供分析目标项目的业务约定模板；实际账户事实仍只来自目标机器的本地文件。
 
 ## 获取与部署
 
@@ -53,3 +53,5 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 完整策略、Skill、研究嗅探、状态、报告与恢复由私有仓库 `york6668/btc-core-strategy` 维护。本仓库以 `core/btc-core-strategy` submodule 固定提交；采集与 reader 仍由本仓库维护。
 
 运行 `git submodule update --init core/btc-core-strategy` 取得核心。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后运行 `python3 roles/validate_repository.py --role all`，包含完整核心与实际 reader 组合验证。云端仅作离线验证，模型、采集、发送、事实与数据仍在本机。
+
+当前核心新入口使用 content revision 6，将冻结的市场结果与整体配置决定分别交给报告和后续复核。旧正式状态、在办研究及 UNKNOWN 投递保留原身份；依赖升级和导出不生成新配置决定。

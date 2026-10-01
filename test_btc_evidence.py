@@ -77,7 +77,7 @@ class EvidenceContractTest(unittest.TestCase):
 class EvidenceHardeningTest(unittest.TestCase):
     def valid(self):
         from pathlib import Path
-        root = Path(__file__).parent / "tests" / "fixtures" / "btc_evidence_v1"
+        root = Path(__import__('os').environ['BTC_READER_TEST_FIXTURE_DIR'])
         text = (root / "valid.txt").read_text(encoding="utf-8")
         bundle = evidence.decode_bundle((root / "valid.json").read_bytes())
         self.assertEqual("valid_auxiliary", evidence.validate_bundle(bundle, text)["status"])
@@ -102,7 +102,7 @@ class EvidenceHardeningTest(unittest.TestCase):
             ("retrieved_at", "garbage", "invalid_retrieved_at"),
             ("as_of", {"x": 1}, "invalid_as_of"),
             ("as_of", "2026-09-04T06:00:00", "invalid_as_of"),
-            ("as_of", "2026-09-04T06:00:01+00:00", "source_time_order"),
+            ("as_of", "2026-09-04T06:00:02+00:00", "source_time_order"),
             ("retrieved_at", "2026-09-05T06:00:00+00:00", "source_time_order"),
             ("source_dates", {"day": "2026-02-30"}, "invalid_source_dates"),
         ):
@@ -422,7 +422,7 @@ class EvidenceHardeningTest(unittest.TestCase):
                             self.assertIsNone(row[key])
                         else:
                             self.assertNotIn(key, row)
-                    self.assertEqual(100, row["quote_volume"])
+                    self.assertEqual(bundle["datasets"][name]["rows"][0]["quote_volume"], row["quote_volume"])
 
     def test_missing_ohlc_keeps_other_consistent_measurements(self):
         for missing in ("open", "high", "low", "close"):
@@ -457,7 +457,7 @@ class EvidenceHardeningTest(unittest.TestCase):
                 row = projected["datasets"]["oi_1h"]["rows"][0]
                 self.assertNotIn("notional_value", row)
                 self.assertNotIn("notional_usd", row)
-                self.assertEqual(100, row["quantity_btc"])
+                self.assertEqual(bundle["datasets"]["oi_1h"]["rows"][0]["quantity_btc"], row["quantity_btc"])
         bundle, text = self.valid()
         bundle["datasets"]["oi_1h"]["rows"][0].update(quantity_btc=0, notional_value=0, notional_usd=0)
         bundle["datasets"]["spot_cvd"]["rows"][0].update(base_volume=0, quote_volume=0,

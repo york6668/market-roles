@@ -32,6 +32,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 def main():
     with tempfile.TemporaryDirectory(prefix="market-role-rehearsal-") as directory:
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'tests'))
+        from build_test_fixtures import build
+        fixtures = Path(directory) / 'reader-fixtures'
+        build(fixtures)
+        os.environ['BTC_READER_TEST_FIXTURE_DIR'] = str(fixtures)
         os.environ.update({
             "BOT_TOKEN": "", "CHAT_ID": "", "BTC_PUSH_OLLAMA_ENABLED": "0",
             "BTC_PUSH_NEWS_TRANSLATE_WITH_OLLAMA": "0", "BTC_PUSH_IMMEDIATE_FIRST": "0",

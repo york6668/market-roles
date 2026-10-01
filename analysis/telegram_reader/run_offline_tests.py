@@ -30,6 +30,9 @@ def run() -> int:
     with workspace as directory:
         sandbox = Path(directory).resolve()
         tempfile.tempdir = str(sandbox)
+        from build_test_fixtures import build
+        build(sandbox / 'reader-fixtures')
+        os.environ['BTC_READER_TEST_FIXTURE_DIR'] = str(sandbox / 'reader-fixtures')
 
         def is_temporary(path):
             if isinstance(path, int):

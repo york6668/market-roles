@@ -33,10 +33,10 @@ import market_observation
 
 
 def seed(project):
-    fixture = role_support.read_json(Path(__file__).with_name('synthetic-analysis.json'))
+    fixture = role_support.read_json(Path(os.environ['BTC_ANALYSIS_TEST_FIXTURE']))
     project.mkdir()
     for name in ('资产配置.md', '操作记录.md', '纠正记录.md'):
-        (project / name).write_text(fixture['facts'])
+        (project / name).write_text(fixture['facts'][name])
     (project / '价值因子.md').write_text('Synthetic method guidance. No real assets.\n')
     root = project / '.strategy/v4'
     for identity, value in fixture['versions'].items():
@@ -52,6 +52,8 @@ def seed(project):
     for name, value in fixture['outbox'].items():
         common.create(root / name, value)
     for name, value in fixture['delivery_baselines'].items():
+        common.create(root / name, value)
+    for name, value in fixture['research'].items():
         common.create(root / name, value)
     (root / 'current').symlink_to('versions/' + fixture['decision']['decision_id'])
     common.create(root / 'write-policy.json', {'minimum_assessment_revision': 5})
@@ -137,6 +139,10 @@ class AnalysisRoleTests(unittest.TestCase):
         value.update(market_assessment=self.fixture['decision']['assessment']['outlook']['market_assessment'],
             dispute_zones=self.fixture['decision']['assessment']['outlook']['dispute_zones'],
             factor_checks={'items': [], 'summary': 'Synthetic factor interpretation remains limited.'})
+        from test_closed_loop import forward
+        for item in value['market_assessment']['markets']:
+            for horizon in item['horizons']:
+                horizon['forward'] = forward(item['as_of'])
         directory = Path(prepared['run']).parent
         market_file = directory / 'market-authored.json'; common.create(market_file, value)
         public = self.native('run-advance', '--run', prepared['run'], '--stage', 'market',
@@ -145,6 +151,12 @@ class AnalysisRoleTests(unittest.TestCase):
             'side': side, 'findings': ['NO_MATERIAL_CHANGE'], 'refs': ['windows.4h.binance_spot_1h'],
             'explanation': 'Synthetic checks leave the recorded response unchanged.'}
             for side in ('upper_short','lower_spot')], 'main_evaluation': {'required': False, 'reasons': []}}
+        portfolio = common.read(public['portfolio_context'])
+        personal['allocation_review'] = {'market_result_hash': public['market_result_hash'],
+            'allocation_decision_hash': None, 'fact_version': portfolio['fact_version'],
+            'outcome': 'EVIDENCE_LIMITED', 'material': False,
+            'explanation': 'Legacy report prose is not a formally adopted allocation decision.',
+            'limitations': ['A real revision six allocation assessment is pending.']}
         personal_file = directory / 'portfolio-authored.json'; common.create(personal_file, personal)
         output = self.native('run-advance', '--run', prepared['run'], '--stage', 'observe',
                              '--template', public['observation_template'], '--answers', personal_file)
@@ -152,7 +164,7 @@ class AnalysisRoleTests(unittest.TestCase):
                   '--template', public['observation_template'], '--answers', personal_file)
         return output, replay
 
-    def test_native_revision5_prepare_and_repeat_preserve_owners_and_report_identity(self):
+    def test_revision6_prepare_preserves_revision5_owners_and_report_identity(self):
         original = common.facts(self.project)
         prepared = self.prep()
         ctx = common.read(prepared['context'])

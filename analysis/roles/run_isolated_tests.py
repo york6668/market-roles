@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import subprocess
 import tempfile
 import types
 import unittest
@@ -26,6 +27,19 @@ def main():
     with tempfile.TemporaryDirectory(prefix='btc-analysis-offline-') as directory:
         sandbox = Path(directory).resolve()
         tempfile.tempdir = str(sandbox)
+        for name in ('资产配置.md', '操作记录.md', '纠正记录.md'):
+            (sandbox / name).write_text('SYNTHETIC TEST FACTS ONLY\n')
+        node = sandbox / 'node.json'
+        node.write_text(json.dumps({'schema': 'BTC_NODE_CONFIG_V1', 'project_dir': str(sandbox),
+            'legacy_revision2_dir': str(sandbox / 'fixtures'), 'python': sys.executable,
+            'frozen_market_python': sys.executable}))
+        os.environ['BTC_NODE_CONFIG'] = str(node)
+        os.environ['BTC_TEST_FIXTURE_DIR'] = str(sandbox / 'fixtures')
+        os.environ['BTC_ANALYSIS_TEST_FIXTURE'] = str(sandbox / 'analysis.json')
+        subprocess.run([sys.executable, str(root / 'scripts/build_synthetic_fixtures.py'),
+                        '--output', str(sandbox / 'fixtures')], check=True)
+        from generate_synthetic import build
+        build(sandbox / 'analysis.json')
         def temporary(path):
             return isinstance(path, int) or Path(os.fsdecode(path)).resolve().is_relative_to(sandbox)
         def audit(event, args):
