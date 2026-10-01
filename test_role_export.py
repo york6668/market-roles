@@ -40,6 +40,24 @@ class RoleExportTests(unittest.TestCase):
             export('analysis', self.destination, self.root)
         self.assertFalse(self.destination.exists())
 
+    def test_analysis_composes_core_owned_manifest_and_rejects_overlap(self):
+        self.manifest({'telegram_reader/shared.py': 'shared.py'})
+        (self.root / '.gitmodules').write_text('[submodule "core"]\n')
+        core = self.root / 'core/btc-core-strategy'; core.mkdir(parents=True)
+        (core / 'export-manifest.json').write_text(json.dumps({'files': ['method.md']}))
+        (core / 'method.md').write_text('model method')
+        export('analysis', self.destination, self.root)
+        self.assertEqual((self.destination / 'method.md').read_text(), 'model method')
+        self.manifest({'method.md': 'shared.py'})
+        with self.assertRaisesRegex(ValueError, 'overlap'):
+            export('analysis', self.destination.with_name('other'), self.root)
+
+    def test_missing_core_dependency_has_no_local_skill_fallback(self):
+        self.manifest({'telegram_reader/shared.py': 'shared.py'})
+        (self.root / '.gitmodules').write_text('[submodule "core"]\n')
+        with self.assertRaisesRegex(FileNotFoundError, 'submodule'):
+            export('analysis', self.destination, self.root)
+
 
 if __name__ == '__main__':
     unittest.main()

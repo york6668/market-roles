@@ -7,7 +7,7 @@
 - [统一角色框架](roles/MARKET_ROLE_FRAMEWORK.md)：职责、数据契约、部署与状态恢复。
 - [采集配置样例](roles/collector.example.json)：仅为样例，部署前生成本机配置。
 - [分析部署与恢复](analysis/roles/ANALYSIS_DEPLOYMENT.md)、[分析配置样例](analysis/roles/machine-analysis.example.json)。
-- [分析方法 Skill](analysis/skill/btc-core-strategy/SKILL.md)：随版本维护，不依赖云端继承本机个人 Skill。
+- [分析方法 Skill](core/btc-core-strategy/skill/btc-core-strategy/SKILL.md)：随版本维护，不依赖云端继承本机个人 Skill。
 - `roles/role_support.py`：本机配置检查、服务预览、源码备用快照和状态备份恢复。
 - `roles/export_role.py`：按 `roles/source-map.json` 的显式文件集合导出角色。
 
@@ -27,7 +27,7 @@ Codex 云端环境准备阶段执行 `sh roles/cloud-setup.sh`，安装依赖后
 
 ## 角色源码布局
 
-采集模块保持在仓库根目录；分析专属 reader、Skill 和部署入口位于 `analysis/`。共享模块及恢复工具只在根目录维护一份；分析目录中的相对符号链接供仓库内阅读和测试使用。导出时按文件映射生成普通文件，目标机器不依赖仓库外的代码目录。
+采集模块保持在仓库根目录；分析专属 reader 和部署入口位于 `analysis/`。共享模块及恢复工具只在根目录维护一份；分析目录中的相对符号链接供仓库内阅读和测试使用。导出时按文件映射生成普通文件，目标机器不依赖仓库外的代码目录。
 
 ```sh
 python3 -B roles/export_role.py collector /absolute/new/collector-source
@@ -47,3 +47,9 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 ## 资料归属
 
 仓库中的框架、契约、必要方法资料和测试随源码一起审核。「投资-btc」项目保存角色概览、策略资料和已发布的仓库版本入口。项目中早先上传的独立脚本和源码 JSON 只作为历史快照，不覆盖仓库指定版本。
+
+## 独立核心版本
+
+完整策略、Skill、研究嗅探、状态、报告与恢复由私有仓库 `york6668/btc-core-strategy` 维护。本仓库以 `core/btc-core-strategy` submodule 固定提交；采集与 reader 仍由本仓库维护。
+
+运行 `git submodule update --init core/btc-core-strategy` 取得核心。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后运行 `python3 roles/validate_repository.py --role all`，包含完整核心与实际 reader 组合验证。云端仅作离线验证，模型、采集、发送、事实与数据仍在本机。

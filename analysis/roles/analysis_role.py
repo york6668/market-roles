@@ -23,6 +23,8 @@ def machine_config(path):
 
 
 def configure_paths(value):
+    if value.get('node_config'):
+        os.environ['BTC_NODE_CONFIG'] = str(role_support.local_path(value['node_config']))
     project = role_support.local_path(value['project_dir'])
     skill = role_support.local_path(value['skill_dir'])
     reader = role_support.local_path(value['code_dir']) / role_support.relative_path(value['entrypoint'])

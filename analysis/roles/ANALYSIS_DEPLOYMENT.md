@@ -112,3 +112,7 @@ helper 保留状态根内部链接并将绝对内部链接规范为相对链接�
 修复让每个标的最新报告的待下载附件优先进入同一个 20 件有界预算，其余待办保留并继续按原顺序处理；失败重试时间不绕过，来源质量不放宽。reader gap 导出含正文/附件身份和下载状态，策略冻结保留必要 report/bundle/transport 身份，排除 file_id、chat_id、采集 prose；身份不能提升事实可信度。VOO 的代理关系、UNKNOWN 复权与质量缺口不修成可分析。
 
 离线验收使用合成数据和临时目录，禁真实网络、凭据、发送和生产调度。通过参考包解包后运行 `roles/verify_analysis_reference.py`；它分别验证 reader、身份冻结和真实策略入口，包含 revision 5 market→observe、同一观察恢复、SQLite/WAL、内部链接、游标、研究待办和 PENDING/UNKNOWN/DELIVERED 保留。结果只证明源码与恢复接口；实际模型判断、真实发送、云端发布和自然小时运行各自需要实际证据。
+
+## 独立核心发布
+
+核心版本由 `core/btc-core-strategy` 的 Git 提交确定。使用核心的 `scripts/release.py` 与本机节点配置安装，正式模板见核心 `tasks/hourly.md`，恢复方式见 Skill 的 `references/releases.md`。Skill、代码、方法和测试一起发布，不单独复制 Skill 文件夹。旧 `build_analysis_reference.py` 仍可生成角色源码包，但改从本仓库及固定 submodule 导出，不读取资产项目中的核心副本。

@@ -31,9 +31,12 @@ def main():
             target = Path(directory) / role
             exported = export(role, target)
             entries = ('roles/offline_tests.py',) if role == 'collector' else (
-                'telegram_reader/run_offline_tests.py', 'roles/run_isolated_tests.py')
+                'telegram_reader/run_offline_tests.py', 'roles/run_isolated_tests.py', 'scripts/run_tests.py')
             for entry in entries:
-                result = subprocess.run([sys.executable, '-B', str(target / entry)],
+                command = [sys.executable, '-B', str(target / entry)]
+                if entry == 'scripts/run_tests.py':
+                    command.extend(['--reader', str(target / 'telegram_reader')])
+                result = subprocess.run(command,
                                         cwd=target, env=environment)
                 results.append({'role': role, 'entrypoint': entry,
                                 'files': exported['files'], 'exit_code': result.returncode})

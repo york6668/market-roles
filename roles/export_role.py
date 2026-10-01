@@ -23,6 +23,17 @@ ROOT = Path(__file__).resolve().parents[1]
 def export(role, destination, root=ROOT):
     root = Path(root).resolve()
     entries = json.loads((root / 'roles/source-map.json').read_text())[role]
+    entries = dict(entries)
+    dependency = root / 'core/btc-core-strategy'
+    if role == 'analysis' and (root / '.gitmodules').is_file():
+        manifest = dependency / 'export-manifest.json'
+        if not manifest.is_file():
+            raise FileNotFoundError('initialize pinned core: git submodule update --init core/btc-core-strategy')
+        for name in json.loads(manifest.read_text())['files']:
+            name = str(relative_path(name))
+            if name in entries:
+                raise ValueError('core and reader export destinations overlap: ' + name)
+            entries[name] = 'core/btc-core-strategy/' + name
     if not entries:
         raise ValueError('role source set is empty')
     destination = Path(destination).expanduser().absolute()

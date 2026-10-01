@@ -1,0 +1,4 @@
+[submodule "core/btc-core-strategy"]
+	path = core/btc-core-strategy
+	url = https://github.com/york6668/btc-core-strategy.git
+	branch = main
