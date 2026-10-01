@@ -1,0 +1,11 @@
+{
+  "python": "3.9.6+",
+  "reader_requirements": "telegram_reader/requirements.txt",
+  "reader_dependencies": [
+    "keyring==25.7.0"
+  ],
+  "strategy_and_role_dependencies": "Python standard library",
+  "frozen_evidence": "Preserve exact raw bytes; optional local BTC_FROZEN_MARKET_PYTHON",
+  "analysis_execution": "Existing local Codex automation/model is independently managed; a Python service is not a model task",
+  "offline_tests": "Standard-library unittest; Keychain, sockets, subprocesses inside tests, real facts and non-temporary databases/writes denied"
+}

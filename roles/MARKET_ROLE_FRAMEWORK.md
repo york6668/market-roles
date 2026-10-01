@@ -1,0 +1,96 @@
+# 行情采集与分析角色框架
+
+框架版本：2026.10.01.2；部署代码以 Git 指定提交为准。
+
+「投资-btc」项目维护角色概览、策略资料和发布版本入口；私有 GitHub 仓库 `york6668/market-roles` 集中维护完整源码、工程框架、业务契约及测试。新版 Codex 云端环境 `market-roles` 用于开发和离线验证。程序、定时任务、数据和业务运行上下文落实在承担角色的机器上。云端项目用于工程维护与重建，不参与每轮本地定时执行。本框架不提供跨机器一键部署、自动接管、SSH 或 MCP 调度服务。
+
+## 角色与初始绑定
+
+| 角色 | 当前机器 | 程序与状态 | 运行方式 |
+| --- | --- | --- | --- |
+| collector | Mac-mini.local | `/Users/york/scripts/btc_push.py`；`~/.btc_push_state_tokyo.json` 及其相关 JSON、SQLite | 现有 `com.york.btcpush` LaunchAgent 常驻；采集线程持续运行，内部按小时调度 |
+| analysis | yorkdeMac-mini.local | reader 实际运行于 `~/Library/Application Support/btc-telegram-reader/app`；策略上下文位于 `/Users/york/Documents/ChatGPT/btc`，策略入口为 `btc-core-strategy/scripts/strategy_v4.py` | 原 reader 每小时第 10 分钟同步；Codex 本地小时分析任务 |
+
+机器名称用于识别，不能从名称推断在线状态。角色可以换机，也可以同机承担多个角色。任何具体操作先读该机器的实际配置；本表不是跨机器命令入口。analysis 的部署路径和测试入口见 [分析部署说明](../analysis/roles/ANALYSIS_DEPLOYMENT.md)。
+
+采集角色负责公开数据、必要的机械指标计算、历史与质量记录、现有行情简报及证据附件。分析角色负责证据摄取和独立来源核验、市场判断、组合分析、报告及后续条件。采集程序不因角色整理新增策略决定或资产操作。
+
+## 资料及变更归属
+
+仓库是工程框架、源码、契约及测试的权威来源。项目 Sources 保存角色说明、策略资料和仓库固定版本入口；已有独立脚本标记为历史快照，不与仓库维护两套实现。发布后在项目说明中记录具体提交；不能从文件上传、Git 提交或环境保存推断云端测试及本地部署均已完成。
+
+新版 Codex 云端环境从该仓库准备 Python 3.11 和测试依赖，发布后以新任务验证。仓库中的 AGENTS.md 提供自包含入口，必要 Skill 和方法资料随代码提供。正式运行仍兼容两端现有 Python 3.9；云端不接入正式消费队列、业务数据或发送凭据。
+
+备用源码包仍采用 `market-role-source-v1` JSON，`files` 保存相对路径与完整 UTF-8 源码。它是本地备用重建材料，不是云端代码管理入口或机器状态备份；使用时必须核对快照版本。
+
+业务语义在框架和对应源码中一起维护；机器路径、运行环境和凭据引用在机器配置中维护。复用经过测试的参考实现，仅为目标机器生成必要配置和适配；如重新生成实现，必须通过相同契约测试。新机器不能只依靠聊天摘要重建业务行为。
+
+框架与业务 mappings 供模型阅读；程序不解析 Markdown。运行时只读取明确的机器 JSON 配置、现有环境变量及业务数据。既有投资资料和策略 Skill 继续有效，工程部署文档不替代当前研究方法。
+
+## 数据交换契约
+
+- 继续使用既有 Telegram 正文及证据附件。reader 完成文本和附件持久化后推进消费游标，再向分析角色导出辅助观察；不增加第二个竞争消费同一更新流的 reader。
+- BTC、QQQ、VOO 的身份、状态、调度、报告和投递独立；COMMON 维护共享宏观和事件简报。VOO 股票身份是 `EQ_VOO`，SPY 衍生数据保持 `proxy`，不得改成 VOO 合约。
+- 保留来源发布时间、观察窗口、抓取时间、质量原因与交易时段。抓取或恢复时间不得替代来源时间；休市、预热、过期、缺失、复权 UNKNOWN 等状态如实传递。
+- 兼容现有证据 V1/V2；升级生产者前验证读取端兼容。V2 原始数据域和测量都保留。正文 message_id、附件 message_id 和回复关系共同确定身份。
+- 最新附件待下载、无效或编辑失配时，不回退旧报告冒充最新；晚到旧附件不覆盖新报告。重复、乱序、重启、重放均通过既有身份去重。
+- `valid_auxiliary` 只说明附件校验通过，独立来源计数仍为 0。分析端继续独立核验公开来源，不能把采集结果直接提升为 VERIFIED。
+- 保留现有报告节奏：重启不补发错过小时，复市不额外触发行情简报；无业务意义变化时不制造同义策略报告。生成、入队、发送和实际送达分别记录。`UNKNOWN` 投递不能自动重发。
+
+遇到 `attachment_unavailable`，按本次报告身份定位生产者投递记录、reader 消费位置、正文附件关联、下载/校验状态和导出参数。只修复具体版本、绑定或消费缺陷。真实上游缺失继续降级；不得用旧附件、合成数据或强制有效状态掩盖问题。
+
+## 本地工具入口
+
+`roles/role_support.py` 仅使用 Python 标准库，Python 3.9 及以上可用。它不调用网络、模型、Telegram 或其他机器。它提供源码打包/展开、机器配置检查、launchd 配置生成与状态读取、离线备份和恢复。正式启动命令 `run` 才会执行配置中的既有角色程序。
+
+```sh
+python3 roles/export_role.py collector /ABS/new-code
+python3 /ABS/new-code/roles/role_support.py check --config /ABS/collector.json
+python3 /ABS/new-code/roles/role_support.py render-service --config /ABS/collector.json /ABS/collector.plist
+python3 /ABS/new-code/roles/role_support.py status --config /ABS/collector.json
+```
+
+源码展开目的目录必须不存在，避免覆盖已有工作。机器配置以 `roles/collector.example.json` 为例：设置角色、机器、Python、代码入口与参数、日志目录、服务标签、业务状态路径、写入锁和本地凭据文件引用。collector 依赖 `requests` 与 `feedparser`；先复用实际可用 Python 环境，无需例行重装依赖。
+
+凭据文件是仅本机所有者可读写的 JSON，存放原服务使用的环境键值。只引用路径，不把值复制到框架、源码参考包或聊天。现有服务继续使用现有凭据配置；本次整理不要求迁移凭据。新实例使用 `private_environment_file` 时先设置权限 0600，创建日志目录。helper 生成的 plist 只含路径与启动参数，不嵌入凭据。
+
+## 服务安装与回滚
+
+保留当前正常运行的 LaunchAgent。框架更新和打包本身不重启服务。新目录先做离线检查和预览，通过后才切换。安装使用目标机器自己的 Codex 会话；不能在本机用路径相同就误操作另一台机器。
+
+collector 候选 plist 经 `plutil -lint /ABS/collector.plist` 检查后，先用 `launchctl print gui/$(id -u)/com.york.btcpush` 确认当前实例。需要替换时保存旧 plist，停止旧服务，确保旧进程退出及写入锁已释放，再安装新 plist 到该用户的 `Library/LaunchAgents` 并用 `launchctl bootstrap gui/$(id -u) /ABS/installed.plist` 启动。新机器使用配置中的实际标签；同一正式角色不能保留两个活动实例。
+
+analysis 继续由 reader 服务和 Codex 本地自动任务分别负责摄取及分析。保留现有小时计划、提示词、模型分工和报告目的地。新机的 Codex 自动任务通过应用的自动任务工具/界面配置，不手写平台内部 automation.toml，也不把模型任务伪装为 launchd shell 脚本。
+
+切换失败时停止新实例，恢复旧代码目录、旧 plist 与匹配状态；确认只剩一个正式实例后启动旧服务。不可在已经产生新业务结果后直接覆盖旧快照：先保留新结果并核对回执和 UNKNOWN 状态，避免回滚造成重复发送。渲染候选 plist、源码重建和状态恢复都不会自动启动服务。
+
+## 业务状态与上下文恢复
+
+collector 的恢复集合包括 BTC/QQQ/VOO 主 JSON、liquidation 与 Hyperliquid 侧车、delivery SQLite 和 market history SQLite；COMMON 快照、去重信息和调度记录在 delivery 库中。`collector.example.json` 已列出默认路径。实际状态里的历史归档引用如果仍会被读取，需把对应归档纳入恢复集合并保留可解析路径；不能只复制主 JSON。
+
+analysis 的恢复集合由实际部署说明列出，至少包括 reader 数据库与消费游标、证据库、策略当前基线及历史、已采纳报告、待办条件、投递状态和本地事实。运行上下文从明确的数据文件恢复；不要复制用户认证、浏览器配置或整个 Codex 主目录。Codex 聊天历史可辅助理解，但不能成为唯一运行状态来源。
+
+备份前停止所有相关写入者。collector helper 会尝试取得配置中已有的 writer lock；analysis 还需等待当前 Codex 分析轮次完成并暂停自动任务，停止 reader。helper 不替用户修改或暂停 Codex 自动任务。它检查复制期间所有文件是否变化，在临时副本中恢复 SQLite WAL，再生成独立可读备份；检测到写入或未恢复 rollback journal 即失败。
+
+```sh
+python3 roles/role_support.py snapshot --config /ABS/old-machine.json /ABS/local-backup
+python3 roles/role_support.py restore --config /ABS/new-machine.json /ABS/local-backup
+```
+
+备份只保存在本地。恢复配置必须保留全部逻辑状态名，映射到新的未使用位置；不与活动状态合并、不覆盖已有数据、不自动启动。恢复完成后，用该角色本来的只读检查确认游标、基线、待办、报告回执和未知状态，再恢复服务/自动任务。新节点没有历史备份时明确以空历史预热运行，不能宣称恢复了原状态。
+
+## 离线重建和验收
+
+从仓库指定提交导出角色源码，在隔离目录重建，使用临时 `STATE_FILE` 与空 `BOT_TOKEN`/`CHAT_ID`，禁止真实网络和正式发送。不得为隔离测试改写 HOME 或实际生产配置。
+
+collector 最小有效入口：
+
+```sh
+python3 -B roles/offline_tests.py test_role_support test_btc_joint_replay test_btc_evidence_reader test_btc_delivery test_market_evidence_v2
+```
+
+该入口在临时状态下运行，并阻断出站网络；省略测试名称时执行参考源码中的全部测试。覆盖源码重建、机器路径变更、SQLite/WAL 恢复、内部上下文链接、游标与待办保留、已完成报告不重复执行、UNKNOWN 不重发、重复/乱序/缺失附件、过期和质量降级。分析角色使用其参考源码的真实策略测试入口，不能用 collector 测试替代策略验收。
+
+若应用运行代码变更，离线通过后按角色逐个切换；观察下一次自然执行的采集、投递、入库、导出和分析结果。无需额外真实推送。自然执行未发生时明确标注未验证；历史验收或进程运行不代表当前所有来源可用。
+
+新项目会话应只从项目资料识别两种角色、当前绑定、仓库版本、部署输入、业务边界、恢复集合及验证入口。新的 Codex 云端会话还必须实际读取仓库源码并运行两种角色的离线验证；仅看到仓库链接不算源码可用。该检查不授予远程部署或发送指令的权限，也不要求云端直接访问本地机器。

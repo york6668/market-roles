@@ -1,0 +1,581 @@
+{
+  "format": "market-role-source-allowlist-v1",
+  "role": "analysis",
+  "version": "2026.10.01.1",
+  "files": [
+    {
+      "source_root": "project",
+      "path": "telegram_reader/bot_client.py",
+      "destination": "telegram_reader/bot_client.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/evidence.py",
+      "destination": "telegram_reader/evidence.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/models.py",
+      "destination": "telegram_reader/models.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/reader.py",
+      "destination": "telegram_reader/reader.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/store.py",
+      "destination": "telegram_reader/store.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/sync_engine.py",
+      "destination": "telegram_reader/sync_engine.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/btc_evidence.py",
+      "destination": "telegram_reader/btc_evidence.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/btc_evidence_reader.py",
+      "destination": "telegram_reader/btc_evidence_reader.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/btc_collection.py",
+      "destination": "telegram_reader/btc_collection.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/market_assets.py",
+      "destination": "telegram_reader/market_assets.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/market_evidence.py",
+      "destination": "telegram_reader/market_evidence.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/market_evidence_v2.py",
+      "destination": "telegram_reader/market_evidence_v2.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/market_history.py",
+      "destination": "telegram_reader/market_history.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/market_observations.py",
+      "destination": "telegram_reader/market_observations.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/market_sources.py",
+      "destination": "telegram_reader/market_sources.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/market_reader.py",
+      "destination": "telegram_reader/market_reader.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/collector_v2_reader.py",
+      "destination": "telegram_reader/collector_v2_reader.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/requirements.txt",
+      "destination": "telegram_reader/requirements.txt"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/README.md",
+      "destination": "telegram_reader/README.md"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/test_btc_evidence.py",
+      "destination": "telegram_reader/test_btc_evidence.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/test_btc_evidence_reader.py",
+      "destination": "telegram_reader/test_btc_evidence_reader.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/run_offline_tests.py",
+      "destination": "telegram_reader/run_offline_tests.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_bot_client.py",
+      "destination": "telegram_reader/tests/test_bot_client.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_evidence.py",
+      "destination": "telegram_reader/tests/test_evidence.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_collector_latest_cli.py",
+      "destination": "telegram_reader/tests/test_collector_latest_cli.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_collector_cli.py",
+      "destination": "telegram_reader/tests/test_collector_cli.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_current_attachment_priority.py",
+      "destination": "telegram_reader/tests/test_current_attachment_priority.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_document_download.py",
+      "destination": "telegram_reader/tests/test_document_download.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_collector_sync_ordering.py",
+      "destination": "telegram_reader/tests/test_collector_sync_ordering.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_store.py",
+      "destination": "telegram_reader/tests/test_store.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_security.py",
+      "destination": "telegram_reader/tests/test_security.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_collector_replay.py",
+      "destination": "telegram_reader/tests/test_collector_replay.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_sync_engine.py",
+      "destination": "telegram_reader/tests/test_sync_engine.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/test_evidence_v2.py",
+      "destination": "telegram_reader/tests/test_evidence_v2.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/collector_replay_fixture.py",
+      "destination": "telegram_reader/tests/collector_replay_fixture.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/reader_replay_fixture.py",
+      "destination": "telegram_reader/tests/reader_replay_fixture.py"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/docs/BTC_COLLECTOR_EVIDENCE_V1.md",
+      "destination": "telegram_reader/docs/BTC_COLLECTOR_EVIDENCE_V1.md"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/docs/MARKET_COLLECTOR_EVIDENCE_V1.md",
+      "destination": "telegram_reader/docs/MARKET_COLLECTOR_EVIDENCE_V1.md"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/fixtures/btc_evidence_v1/valid.json",
+      "destination": "telegram_reader/tests/fixtures/btc_evidence_v1/valid.json"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/fixtures/btc_evidence_v1/valid.txt",
+      "destination": "telegram_reader/tests/fixtures/btc_evidence_v1/valid.txt"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/fixtures/btc_evidence_v1/missing.json",
+      "destination": "telegram_reader/tests/fixtures/btc_evidence_v1/missing.json"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/fixtures/btc_evidence_v1/missing.txt",
+      "destination": "telegram_reader/tests/fixtures/btc_evidence_v1/missing.txt"
+    },
+    {
+      "source_root": "project",
+      "path": "telegram_reader/tests/fixtures/btc_evidence_v1/telegram_updates.json",
+      "destination": "telegram_reader/tests/fixtures/btc_evidence_v1/telegram_updates.json"
+    },
+    {
+      "source_root": "skill",
+      "path": "SKILL.md",
+      "destination": "skill/btc-core-strategy/SKILL.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/pattern_semantics.py",
+      "destination": "skill/btc-core-strategy/scripts/pattern_semantics.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/strategy_v4.py",
+      "destination": "skill/btc-core-strategy/scripts/strategy_v4.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/revision2_report_bridge.py",
+      "destination": "skill/btc-core-strategy/scripts/revision2_report_bridge.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/event_contract.py",
+      "destination": "skill/btc-core-strategy/scripts/event_contract.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/strategy_contract.py",
+      "destination": "skill/btc-core-strategy/scripts/strategy_contract.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/collector_observation.py",
+      "destination": "skill/btc-core-strategy/scripts/collector_observation.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/decision_report.py",
+      "destination": "skill/btc-core-strategy/scripts/decision_report.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/market_observation.py",
+      "destination": "skill/btc-core-strategy/scripts/market_observation.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/run_usage.py",
+      "destination": "skill/btc-core-strategy/scripts/run_usage.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/reporting.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/reporting.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/market_runtime.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/market_runtime.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/report.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/report.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/draft.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/draft.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/evidence.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/evidence.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/migration.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/migration.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/main_flow.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/main_flow.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/mobile_report.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/mobile_report.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/storage.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/storage.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/run_flow.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/run_flow.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/authored_report.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/authored_report.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/common.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/common.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/hourly.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/hourly.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/brief_report.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/brief_report.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/__init__.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/__init__.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/collector.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/collector.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/recommendations.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/recommendations.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/semantics.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/semantics.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/equity_products.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/equity_products.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/factors.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/factors.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/market_state.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/market_state.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/research.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/research.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/domain.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/domain.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/sensing.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/sensing.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/report_care.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/report_care.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/material_reads.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/material_reads.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/cycle.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/cycle.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/assessment.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/assessment.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "scripts/v4/delivery.py",
+      "destination": "skill/btc-core-strategy/scripts/v4/delivery.py"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/runtime-maintenance.md",
+      "destination": "skill/btc-core-strategy/references/runtime-maintenance.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/v4-contract.md",
+      "destination": "skill/btc-core-strategy/references/v4-contract.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/market-state.md",
+      "destination": "skill/btc-core-strategy/references/market-state.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/market-observation.md",
+      "destination": "skill/btc-core-strategy/references/market-observation.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/state-projection.md",
+      "destination": "skill/btc-core-strategy/references/state-projection.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/equity-products.md",
+      "destination": "skill/btc-core-strategy/references/equity-products.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/mobile-report.md",
+      "destination": "skill/btc-core-strategy/references/mobile-report.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/recommendation-maintenance.md",
+      "destination": "skill/btc-core-strategy/references/recommendation-maintenance.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/report-expression.md",
+      "destination": "skill/btc-core-strategy/references/report-expression.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/core-strategy.md",
+      "destination": "skill/btc-core-strategy/references/core-strategy.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/legacy-domain-v3.md",
+      "destination": "skill/btc-core-strategy/references/legacy-domain-v3.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/market-reporting.md",
+      "destination": "skill/btc-core-strategy/references/market-reporting.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/report-care.md",
+      "destination": "skill/btc-core-strategy/references/report-care.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/collector-evidence.md",
+      "destination": "skill/btc-core-strategy/references/collector-evidence.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "references/run-flow.md",
+      "destination": "skill/btc-core-strategy/references/run-flow.md"
+    },
+    {
+      "source_root": "skill",
+      "path": "tests/test_collector_provenance.py",
+      "destination": "skill/btc-core-strategy/tests/test_collector_provenance.py"
+    },
+    {
+      "source_root": "project",
+      "path": "AGENTS.md",
+      "destination": "project-methods/AGENTS.md"
+    },
+    {
+      "source_root": "project",
+      "path": "价值因子.md",
+      "destination": "project-methods/价值因子.md"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/role_support.py",
+      "destination": "roles/role_support.py"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/analysis_role.py",
+      "destination": "roles/analysis_role.py"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/machine-analysis.example.json",
+      "destination": "roles/machine-analysis.example.json"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/analysis-contract.json",
+      "destination": "roles/analysis-contract.json"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/ANALYSIS_DEPLOYMENT.md",
+      "destination": "roles/ANALYSIS_DEPLOYMENT.md"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/analysis-automation-prompt.md",
+      "destination": "roles/analysis-automation-prompt.md"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/tests/synthetic-analysis.json",
+      "destination": "roles/tests/synthetic-analysis.json"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/tests/test_analysis_role.py",
+      "destination": "roles/tests/test_analysis_role.py"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/run_isolated_tests.py",
+      "destination": "roles/run_isolated_tests.py"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/verify_analysis_reference.py",
+      "destination": "roles/verify_analysis_reference.py"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/build_analysis_reference.py",
+      "destination": "roles/build_analysis_reference.py"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/analysis-source-files.json",
+      "destination": "roles/analysis-source-files.json"
+    },
+    {
+      "source_root": "project",
+      "path": "roles/dependencies.json",
+      "destination": "roles/dependencies.json"
+    }
+  ],
+  "excluded": [
+    "actual .strategy/**",
+    "real market fixtures",
+    "asset facts",
+    "messages/SQLite/runtime logs",
+    "automation memory/history/config",
+    "credentials and logins",
+    "rollback files"
+  ]
+}

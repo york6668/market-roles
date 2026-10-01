@@ -1,0 +1,20 @@
+{
+  "format": "market-role-contract-v1",
+  "version": "2026.10.01.1",
+  "role": "analysis",
+  "description": "Local channel evidence intake and model-led BTC/QQQ/VOO analysis",
+  "source_format": "market-role-source-v1",
+  "components": {
+    "reader": {"entrypoint": "telegram_reader/reader.py", "scheduler": "local launchd", "channel_only": true},
+    "strategy": {"entrypoint": "skill/btc-core-strategy/scripts/strategy_v4.py", "scheduler": "Codex local automation", "assessment_revision": 5},
+    "method": "skill/btc-core-strategy/SKILL.md",
+    "deployment": "roles/analysis_role.py",
+    "recovery": "roles/role_support.py"
+  },
+  "input": {"schemas": ["BTC_COLLECTOR_EVIDENCE_V1", "MARKET_COLLECTOR_EVIDENCE_V1", "BTC_COLLECTOR_EVIDENCE_V2", "MARKET_COLLECTOR_EVIDENCE_V2"], "reader_command": "collector-observations --asset all", "trust": "UNTRUSTED_LEAD", "latest_gap_fallback": false},
+  "output": {"strategy_owner": "project/.strategy/v4/current", "report": "AUTHORED_REPORT_V1", "delivery_completion": "actual assistant readback and CONFIRM"},
+  "local_only": ["machine paths and schedules", "reader databases and cursor", "evidence blobs", "strategy versions and baselines", "research context", "delivery attempts", "asset fact files", "automation memory", "login and credentials"],
+  "cloud": ["role contract", "reference source", "tests with synthetic inputs", "analysis methods", "deployment and recovery instructions"],
+  "credential_reference": "local Keychain btc.telegram.reader / bot_token",
+  "prohibited_runtime_features": ["cross-machine deployment", "automatic migration", "SSH dispatcher", "cloud data mirror", "launchd model impersonation", "source-bundle runtime state"]
+}
