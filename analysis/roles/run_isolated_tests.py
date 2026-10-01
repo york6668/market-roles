@@ -27,6 +27,8 @@ def main():
     with tempfile.TemporaryDirectory(prefix='btc-analysis-offline-') as directory:
         sandbox = Path(directory).resolve()
         tempfile.tempdir = str(sandbox)
+        for name in ('资产配置.md', '操作记录.md', '纠正记录.md'):
+            (sandbox / name).write_text('SYNTHETIC TEST FACTS ONLY\n', encoding='utf-8')
         config = sandbox / 'node.json'
         config.write_text(json.dumps({'schema': 'BTC_NODE_CONFIG_V1',
             'project_dir': str(sandbox), 'legacy_revision2_dir': str(sandbox / 'legacy'),
