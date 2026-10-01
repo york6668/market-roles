@@ -58,6 +58,26 @@ class RoleExportTests(unittest.TestCase):
         with self.assertRaisesRegex(FileNotFoundError, 'submodule'):
             export('analysis', self.destination, self.root)
 
+    def test_reader_export_needs_no_core_checkout_or_test_data(self):
+        self.manifest({'telegram_reader/shared.py': 'shared.py',
+                       'roles/deployment.py': 'shared.py'})
+        (self.root / '.gitmodules').write_text('[submodule "core"]\n')
+        result = export('reader', self.destination, self.root)
+        self.assertEqual(1, result['files'])
+        self.assertEqual(['shared.py'], [p.name for p in self.destination.iterdir()])
+
+    def test_collector_uses_its_own_manifest_and_rejects_missing_dependency(self):
+        with self.assertRaisesRegex(FileNotFoundError, 'collector'):
+            export('collector', self.destination, self.root)
+        collector = self.root / 'core/market-collector'
+        (collector / 'roles').mkdir(parents=True)
+        (collector / 'source.py').write_text('SOURCE = 1\n')
+        (collector / 'private.json').write_text('local data')
+        (collector / 'roles/collector-source-files.json').write_text(json.dumps(['source.py']))
+        result = export('collector', self.destination, self.root)
+        self.assertEqual(1, result['files'])
+        self.assertFalse((self.destination / 'private.json').exists())
+
 
 if __name__ == '__main__':
     unittest.main()

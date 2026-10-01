@@ -1,1 +1,1 @@
-../../market_reader.py
+../../core/market-collector/market_reader.py

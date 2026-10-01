@@ -2,3 +2,20 @@ __pycache__/
 *.py[cod]
 .DS_Store
 .venv/
+
+# Local state and generated test material
+.local/
+.strategy/
+**/tests/fixtures/
+analysis/roles/tests/synthetic-analysis.json
+*.sqlite*
+*.db
+*.log
+.env*
+**/data/
+**/logs/
+**/backups/
+**/node.json
+**/machine.json
+**/machine-*.json
+!**/machine-*.example.json

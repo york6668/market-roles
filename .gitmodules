@@ -2,3 +2,7 @@
 	path = core/btc-core-strategy
 	url = https://github.com/york6668/btc-core-strategy.git
 	branch = main
+[submodule "core/market-collector"]
+	path = core/market-collector
+	url = https://github.com/york6668/market-collector.git
+	branch = york-worktree/采集端独立维护

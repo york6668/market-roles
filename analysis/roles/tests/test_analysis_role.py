@@ -33,30 +33,41 @@ import market_observation
 
 
 def seed(project):
-    fixture = role_support.read_json(Path(__file__).with_name('synthetic-analysis.json'))
-    project.mkdir()
-    for name in ('资产配置.md', '操作记录.md', '纠正记录.md'):
-        (project / name).write_text(fixture['facts'])
-    (project / '价值因子.md').write_text('Synthetic method guidance. No real assets.\n')
-    root = project / '.strategy/v4'
-    for identity, value in fixture['versions'].items():
-        directory = root / 'versions' / identity
-        common.create(directory / 'decision.json', value['decision'])
-        for name, body in value['views'].items():
-            common.create(directory / name, body.encode())
-    for identity, value in fixture['evidence'].items():
-        directory = root / 'evidence' / identity
-        common.create(directory / 'evidence.json', value['bundle'])
-        for name, raw in value['raw'].items():
-            common.create(directory / 'raw' / name, raw)
-    for name, value in fixture['outbox'].items():
-        common.create(root / name, value)
-    for name, value in fixture['delivery_baselines'].items():
-        common.create(root / name, value)
-    (root / 'current').symlink_to('versions/' + fixture['decision']['decision_id'])
-    common.create(root / 'write-policy.json', {'minimum_assessment_revision': 5})
-    common.create(project / 'frozen-market.json', fixture['market'])
-    return fixture
+    # Reuse the core's scenario constructors, not a serialized strategy snapshot.
+    from test_market_state import RevisionFivePublicationTests
+    from test_workflow_delivery import WorkflowDeliveryTests
+    from v4 import delivery
+    scenario = RevisionFivePublicationTests()
+    deliveries = WorkflowDeliveryTests()
+    try:
+        scenario.setUp()
+        _, _, decision = scenario.adopted()
+        shutil.copytree(scenario.f.project, project, symlinks=True)
+        root = project / '.strategy/v4'
+        # Sealed research paths belong to the original temporary project; the role
+        # scenario starts from the published version and creates its own research.
+        for name in ('research', 'runs'):
+            if (root / name).exists():
+                shutil.rmtree(root / name)
+        market = deepcopy(scenario.f.raw)
+        deliveries.setUp()
+        delivered = deliveries.queue()
+        deliveries.begin(delivered)
+        delivery.transition(deliveries.root, delivered, 'CONFIRM', deliveries.receipt(delivered))
+        unknown = deliveries.queue(deliveries.publish(2))
+        deliveries.begin(unknown)
+        delivery.transition(deliveries.root, unknown, 'UNKNOWN')
+        deliveries.queue(deliveries.publish(3))
+        for name in ('versions', 'outbox'):
+            shutil.copytree(deliveries.root / name, root / name, dirs_exist_ok=True)
+        for path in deliveries.root.glob('reported-*.json'):
+            shutil.copy2(path, root / path.name)
+        common.replace(root / 'write-policy.json', {'minimum_assessment_revision': 5})
+        common.create(project / 'frozen-market.json', market)
+        return {'decision': decision, 'market': market}
+    finally:
+        deliveries.doCleanups()
+        scenario.doCleanups()
 
 
 class AnalysisRoleTests(unittest.TestCase):

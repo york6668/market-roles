@@ -1,1 +1,1 @@
-../../market_assets.py
+../../core/market-collector/market_assets.py
