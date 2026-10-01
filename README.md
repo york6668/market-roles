@@ -58,3 +58,5 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 单独导出 reader 供核心测试：`python3 roles/export_role.py reader /absolute/new/reader`，只需初始化采集子模块，不递归获取策略依赖。私有依赖准备需要对应仓库的读取权限；测试阶段禁止联网。
 
 GitHub Actions 使用 Secret `MARKET_SOURCE_READ_TOKEN`（本仓、采集仓与策略仓的 Contents read 权限）初始化固定依赖，再运行完整离线验证。凭据仅在仓库设置中保存；缺失时明确失败，不跳过测试。
+
+本机使用 GitHub SSH 时，可执行 `git -c url.ssh://git@github.com/.insteadOf=https://github.com/ submodule update --init core/market-collector core/btc-core-strategy`；仅对本次依赖准备使用 SSH，不修改全局 Git 配置。
