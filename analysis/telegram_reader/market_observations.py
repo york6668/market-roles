@@ -1,1 +1,1 @@
-../../market_observations.py
+../../core/market-collector/market_observations.py

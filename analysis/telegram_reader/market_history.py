@@ -1,1 +1,1 @@
-../../market_history.py
+../../core/market-collector/market_history.py

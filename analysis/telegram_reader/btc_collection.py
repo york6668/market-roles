@@ -1,1 +1,1 @@
-../../btc_collection.py
+../../core/market-collector/btc_collection.py

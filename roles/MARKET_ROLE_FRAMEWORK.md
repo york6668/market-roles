@@ -2,14 +2,14 @@
 
 框架版本：2026.10.01.2；部署代码以 Git 指定提交为准。
 
-「投资-btc」项目维护角色概览、策略资料和发布版本入口；私有 GitHub 仓库 `york6668/market-roles` 集中维护完整源码、工程框架、业务契约及测试。新版 Codex 云端环境 `market-roles` 用于开发和离线验证。程序、定时任务、数据和业务运行上下文落实在承担角色的机器上。云端项目用于工程维护与重建，不参与每轮本地定时执行。本框架不提供跨机器一键部署、自动接管、SSH 或 MCP 调度服务。
+「投资-btc」项目维护角色概览、策略资料和发布版本入口；私有 GitHub 仓库 `york6668/market-roles` 维护 reader、工程框架、角色组合及测试，固定引用采集仓与策略仓。新版 Codex 云端环境 `market-roles` 用于开发和离线验证。程序、定时任务、数据和业务运行上下文落实在承担角色的机器上。云端项目用于工程维护与重建，不参与每轮本地定时执行。本框架不提供跨机器一键部署、自动接管、SSH 或 MCP 调度服务。
 
-## 角色与初始绑定
+## 角色与配置
 
-| 角色 | 当前机器 | 程序与状态 | 运行方式 |
+| 角色 | 机器配置 | 程序与状态 | 运行方式 |
 | --- | --- | --- | --- |
-| collector | Mac-mini.local | `/Users/york/scripts/btc_push.py`；`~/.btc_push_state_tokyo.json` 及其相关 JSON、SQLite | 现有 `com.york.btcpush` LaunchAgent 常驻；采集线程持续运行，内部按小时调度 |
-| analysis | yorkdeMac-mini.local | reader 实际运行于 `~/Library/Application Support/btc-telegram-reader/app`；策略上下文位于 `/Users/york/Documents/ChatGPT/btc`，策略入口为 `btc-core-strategy/scripts/strategy_v4.py` | 原 reader 每小时第 10 分钟同步；Codex 本地小时分析任务 |
+| collector | `COLLECTOR_NODE` | `code_dir/btc_push.py`；本机配置中的 `state_paths` | 采集线程持续运行，内部按小时调度 |
+| analysis | `ANALYSIS_NODE` | 配置中的 reader、项目和 Skill 目录；策略状态为项目 `.strategy/` | reader 每小时第 10 分钟同步；本机模型任务独立配置 |
 
 机器名称用于识别，不能从名称推断在线状态。角色可以换机，也可以同机承担多个角色。任何具体操作先读该机器的实际配置；本表不是跨机器命令入口。analysis 的部署路径和测试入口见 [分析部署说明](../analysis/roles/ANALYSIS_DEPLOYMENT.md)。
 

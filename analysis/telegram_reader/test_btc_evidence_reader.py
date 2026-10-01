@@ -1,1 +1,1 @@
-../../test_btc_evidence_reader.py
+../../core/market-collector/test_btc_evidence_reader.py

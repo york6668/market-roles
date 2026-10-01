@@ -3,6 +3,7 @@
 import json
 import os
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import types
@@ -26,6 +27,13 @@ def main():
     with tempfile.TemporaryDirectory(prefix='btc-analysis-offline-') as directory:
         sandbox = Path(directory).resolve()
         tempfile.tempdir = str(sandbox)
+        config = sandbox / 'node.json'
+        config.write_text(json.dumps({'schema': 'BTC_NODE_CONFIG_V1',
+            'project_dir': str(sandbox), 'legacy_revision2_dir': str(sandbox / 'legacy'),
+            'python': sys.executable, 'frozen_market_python': sys.executable}))
+        os.environ['BTC_NODE_CONFIG'] = str(config)
+        subprocess.run([sys.executable, '-B', str(root / 'scripts/build_synthetic_fixtures.py'),
+                        '--output-dir', str(sandbox / 'legacy')], check=True)
         def temporary(path):
             return isinstance(path, int) or Path(os.fsdecode(path)).resolve().is_relative_to(sandbox)
         def audit(event, args):

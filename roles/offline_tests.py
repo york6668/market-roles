@@ -1,52 +1,18 @@
 #!/usr/bin/env python3
-"""Run the real role tests against temporary state with outbound sockets blocked."""
-import os
+"""Use the collector-owned offline harness for this repository's export tests."""
+import importlib.util
 from pathlib import Path
-import socket
 import sys
-import tempfile
-import unittest
 
-
-_connect = socket.socket.connect
-_connect_ex = socket.socket.connect_ex
-
-
-def blocked_connect(sock, address):
-    if sock.family in (socket.AF_INET, socket.AF_INET6):
-        raise RuntimeError("role rehearsal blocks network access")
-    return _connect(sock, address)
-
-
-def blocked_connect_ex(sock, address):
-    if sock.family in (socket.AF_INET, socket.AF_INET6):
-        raise RuntimeError("role rehearsal blocks network access")
-    return _connect_ex(sock, address)
-
-
-# Spawned test workers also import this module and inherit the same restriction.
-socket.socket.connect = blocked_connect
-socket.socket.connect_ex = blocked_connect_ex
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
-
-def main():
-    with tempfile.TemporaryDirectory(prefix="market-role-rehearsal-") as directory:
-        os.environ.update({
-            "BOT_TOKEN": "", "CHAT_ID": "", "BTC_PUSH_OLLAMA_ENABLED": "0",
-            "BTC_PUSH_NEWS_TRANSLATE_WITH_OLLAMA": "0", "BTC_PUSH_IMMEDIATE_FIRST": "0",
-            "STATE_FILE": str(Path(directory) / "state.json"),
-            "BTC_PUSH_LOG_FILE": str(Path(directory) / "test.log"),
-        })
-        # Let the existing asset-scoped state paths derive from temporary STATE_FILE.
-        os.environ.pop("QQQ_STATE_FILE", None)
-        os.environ.pop("VOO_STATE_FILE", None)
-        names = sys.argv[1:]
-        suite = (unittest.defaultTestLoader.loadTestsFromNames(names) if names else
-                 unittest.defaultTestLoader.discover(str(Path(__file__).resolve().parent.parent), pattern="test_*.py"))
-        result = unittest.TextTestRunner(verbosity=1).run(suite)
-        return 0 if result.wasSuccessful() else 1
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+ROOT = Path(__file__).resolve().parents[1]
+source = ROOT / 'core/market-collector/roles/offline_tests.py'
+if not source.is_file():
+    raise FileNotFoundError('initialize pinned collector: git submodule update --init core/market-collector')
+spec = importlib.util.spec_from_file_location('collector_offline', source)
+harness = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(harness)
+sys.path.insert(0, str(ROOT))
+if not sys.argv[1:]:
+    sys.argv.append('test_role_export')
+if __name__ == '__main__':
+    raise SystemExit(harness.main())

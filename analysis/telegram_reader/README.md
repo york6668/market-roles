@@ -42,7 +42,7 @@ Token 只保存在 macOS 钥匙串，服务名为 `btc.telegram.reader`，账户
 ## 2. 安装和发现目标频道
 
 ```bash
-cd /Users/york/Documents/ChatGPT/btc/telegram_reader
+cd /absolute/local/reader-code
 ./install.sh
 ```
 
@@ -71,7 +71,7 @@ cd /Users/york/Documents/ChatGPT/btc/telegram_reader
 数据库位置：
 
 ```text
-/Users/york/Documents/ChatGPT/btc/telegram_reader/data/messages.sqlite3
+/absolute/local/reader-code/data/messages.sqlite3
 ```
 
 核心表和视图：
@@ -146,8 +146,8 @@ macOS 会限制无人值守的 LaunchAgent 直接从 `Documents` 启动 Python�
 每隔 10 分钟运行。日志只记录数量、时间和脱敏错误类型：
 
 ```text
-/Users/york/Library/Logs/btc-telegram-reader.log
-/Users/york/Library/Logs/btc-telegram-reader.error.log
+/absolute/local/logs/btc-telegram-reader.log
+/absolute/local/logs/btc-telegram-reader.error.log
 ```
 
 停用任务：

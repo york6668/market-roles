@@ -15,7 +15,8 @@ from models import ReaderConfig
 from store import MessageStore
 
 
-FIXTURES = Path(__file__).parent / "fixtures" / "btc_evidence_v1"
+from collector_replay_fixture import protocol_fixture_directory
+FIXTURES = protocol_fixture_directory()
 CHAT_ID = -1000000000001
 
 
