@@ -25,6 +25,26 @@ class RoleSupportTest(unittest.TestCase):
                 "service_label": "test.market.collector", "log_dir": str(self.root / "logs"),
                 "state_paths": paths or {}, "writer_locks": [], "environment": {}}
 
+    def test_collector_container_preparation_preserves_queue_and_does_not_start(self):
+        from roles.containers.prepare_collector import prepare, content
+        state=self.root/'state.json';state.write_text('{"last_update_id": 42, "status": "UNKNOWN"}')
+        queue=self.root/'state.json.delivery.sqlite3'
+        with sqlite3.connect(queue) as db:
+            db.execute('CREATE TABLE pending(id TEXT PRIMARY KEY, state TEXT, original BLOB)')
+            db.execute('INSERT INTO pending VALUES(?,?,?)',('same-id','UNKNOWN',b'original body'))
+        private=self.root/'private.json';private.write_text('{"BOT_TOKEN":"generated-test-value"}');private.chmod(0o600)
+        value=self.value({'btc':str(state),'delivery':str(queue)})
+        value.update(private_environment_file=str(private),environment={'STATE_FILE':str(state)})
+        config=self.root/'collector.json';config.write_text(json.dumps(value))
+        prepared=prepare(config,self.root/'node',self.root/'compose.yaml','test-source')
+        self.assertFalse(prepared['started'])
+        self.assertEqual(content(queue),content(self.root/'node/data'/queue.name))
+        self.assertEqual(state.read_bytes(),(self.root/'node/data'/state.name).read_bytes())
+        saved=json.loads((self.root/'node/collector.json').read_text())
+        self.assertEqual(saved['environment']['STATE_FILE'],'/data/state.json')
+        self.assertEqual(saved['environment']['BTC_PUSH_DELIVERY_DB'],'/data/state.json.delivery.sqlite3')
+        self.assertNotIn('generated-test-value',(self.root/'node/collector.json').read_text())
+
     def test_reference_roundtrip_requires_explicit_sources_and_empty_destination(self):
         (self.root / "main.py").write_text("print('reference')\n")
         (self.root / "private.json").write_text('{"BOT_TOKEN":"not-for-upload"}')

@@ -28,8 +28,13 @@
   "market_streams.py",
   "roles/MARKET_ROLE_FRAMEWORK.md",
   "roles/PROJECT_INSTRUCTIONS.txt",
+  "roles/build_test_fixtures.py",
   "roles/collector-source-files.json",
   "roles/collector.example.json",
+  "roles/containers/Dockerfile",
+  "roles/containers/entrypoint.py",
+  "roles/containers/prepare_collector.py",
+  "roles/containers/reader_bridge.py",
   "roles/offline_tests.py",
   "roles/role_support.py",
   "test_btc_collection.py",
@@ -49,6 +54,5 @@
   "test_market_news.py",
   "test_market_scheduler.py",
   "test_role_support.py",
-  "tests/collector_replay_fixture.py",
-  "roles/build_test_fixtures.py"
+  "tests/collector_replay_fixture.py"
 ]

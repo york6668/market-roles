@@ -23,7 +23,7 @@ python3.11 -m venv .venv
 
 现有 Mac 环境可用其已安装的 Python 3.9 运行同一离线入口。该入口先验证导出工具，再分别导出两种角色到临时目录，运行采集测试、reader 测试及真实 `strategy_v4.py` 的合成恢复测试。`--role collector` 或 `--role analysis` 可缩小到受影响角色。测试使用临时状态、空发送凭据并阻断出站网络。真实服务、launchd、正式 reader 消费和 Codex 自动任务只在对应 Mac 上验证。
 
-Codex 云端环境准备阶段执行 `sh roles/cloud-setup.sh`，安装依赖后执行同一入口；脚本要求已提供 Python 3.11。环境只选择本仓库、保持仅本人使用，不添加正式发送凭据或本机数据。准备完成后保存并发布，再从已发布环境创建全新任务运行 `.venv/bin/python -B roles/validate_repository.py`。保存、发布和新任务通过分别确认。
+Codex 云端环境准备阶段执行 `sh roles/cloud-setup.sh`，安装依赖后执行两角色及新数据层验证；脚本要求 Python 3.11、Docker daemon 和 Compose 实际可用，并启动隔离 MySQL 8.4，缺项明确失败。环境只选择本仓库、保持原访问范围，不添加正式发送凭据或本机数据。准备完成后保存并发布，再从已发布环境创建全新任务运行 `.venv/bin/python -B roles/validate_repository.py --with-data-service`。保存、发布和新任务通过分别确认。新任务先读本仓库 AGENTS、框架及对应核心方法，并核对当前仓库提交、核心 submodule 提交、实际方法入口和依赖；不得用旧任务结果代替新环境生效。
 
 ## 角色源码布局
 
@@ -55,3 +55,9 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 运行 `git submodule update --init core/btc-core-strategy` 取得核心。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后运行 `python3 roles/validate_repository.py --role all`，包含完整核心与实际 reader 组合验证。云端仅作离线验证，模型、采集、发送、事实与数据仍在本机。
 
 当前核心新入口使用 content revision 6，将冻结的市场结果与整体配置决定分别交给报告和后续复核。旧正式状态、在办研究及 UNKNOWN 投递保留原身份；依赖升级和导出不生成新配置决定。
+
+## Docker 节点
+
+两角色共用核心的 [Compose 与数据服务](core/btc-core-strategy/service/README.md)。`roles/containers/build.py collector|reader --docker <实际 Docker CLI> --tag <固定镜像标签>` 从源码白名单生成镜像，不复制运行数据。reader 由 `reader_bridge.py --config <现有节点配置>` 取用宿主 Keychain，经 stdin 执行原同步并在轮询前后保存 MySQL checkpoint。
+
+采集节点先停止旧 writer，使用 `prepare_collector.py --node <原角色配置> --destination <新目录> --compose-file <核心 Compose> --image-tag <已验证版本>` 一致性备份、恢复和逐项核对实际 state_paths。该命令不采集、不发送、不启动服务；切换时仅启动 collector profile，保留原周期、公开来源和 Telegram 队列。回退必须停止容器并导出最新状态，UNKNOWN 不自动重发。首次及切换后恢复演练、实际运行、七个完整日本自然日的分析验收分别完成。

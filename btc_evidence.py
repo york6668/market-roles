@@ -1093,8 +1093,11 @@ def decode_bundle(data):
             if not _number(result):
                 raise ValueError("nonfinite_json")
             return result
-        return json.loads(data, object_pairs_hook=unique_pairs, parse_float=finite_float,
-                          parse_constant=lambda _: (_ for _ in ()).throw(ValueError("nonfinite_json")))
+        result = json.loads(data, object_pairs_hook=unique_pairs, parse_float=finite_float,
+                            parse_constant=lambda _: (_ for _ in ()).throw(ValueError("nonfinite_json")))
+        if not isinstance(result, dict):
+            raise ValueError("evidence_bundle_must_be_object")
+        return result
     except (RecursionError, OverflowError, TypeError, UnicodeError, json.JSONDecodeError) as exc:
         raise ValueError("invalid_evidence_json") from exc
 

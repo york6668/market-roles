@@ -14,6 +14,8 @@ from export_role import export
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--role', choices=('collector', 'analysis', 'all'), default='all')
+    parser.add_argument('--with-data-service', action='store_true', help='also require real MySQL/Docker/CLI/MCP recovery tests')
+    parser.add_argument('--docker', default='docker')
     args = parser.parse_args()
     if sys.version_info < (3, 9):
         parser.error('Python 3.9 or later is required')
@@ -40,6 +42,10 @@ def main():
                                         cwd=target, env=environment)
                 results.append({'role': role, 'entrypoint': entry,
                                 'files': exported['files'], 'exit_code': result.returncode})
+            if role == 'analysis' and args.with_data_service:
+                result = subprocess.run([sys.executable, '-B', str(target / 'service/check.py'), '--docker', args.docker],
+                                        cwd=target, env=environment)
+                results.append({'role': role, 'entrypoint': 'service/check.py', 'exit_code': result.returncode})
     print('MARKET_ROLES_REBUILD_RESULT=' + json.dumps(results, sort_keys=True))
     return 0 if all(result['exit_code'] == 0 for result in results) else 1
 

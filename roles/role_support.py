@@ -103,7 +103,7 @@ def package(root, files, destination, role):
             raise ValueError("source is outside the reference root")
         if any(part in (".strategy", ".git", "__pycache__", "node_modules") for part in relative.parts):
             raise ValueError("runtime data cannot be a source reference")
-        if source.suffix not in (".py", ".md", ".txt", ".json", ".sh"):
+        if source.suffix not in (".py", ".md", ".txt", ".json", ".sh", ".yaml", ".yml") and source.name not in ('Dockerfile', '.dockerignore', '.gitignore'):
             raise ValueError("unsupported source reference type")
         contents[name] = source.read_text(encoding="utf-8")
     if not contents:

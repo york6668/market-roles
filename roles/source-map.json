@@ -56,7 +56,11 @@
     "requirements.txt": "requirements.txt",
     "collector_v2_reader.py": "collector_v2_reader.py",
     "market_reader.py": "market_reader.py",
-    "roles/build_test_fixtures.py": "roles/build_test_fixtures.py"
+    "roles/build_test_fixtures.py": "roles/build_test_fixtures.py",
+    "roles/containers/entrypoint.py": "roles/containers/entrypoint.py",
+    "roles/containers/Dockerfile": "roles/containers/Dockerfile",
+    "roles/containers/reader_bridge.py": "roles/containers/reader_bridge.py",
+    "roles/containers/prepare_collector.py": "roles/containers/prepare_collector.py"
   },
   "analysis": {
     "roles/ANALYSIS_DEPLOYMENT.md": "analysis/roles/ANALYSIS_DEPLOYMENT.md",
@@ -109,6 +113,10 @@
     "telegram_reader/tests/test_store.py": "analysis/telegram_reader/tests/test_store.py",
     "telegram_reader/tests/test_sync_engine.py": "analysis/telegram_reader/tests/test_sync_engine.py",
     "roles/generate_synthetic.py": "analysis/roles/generate_synthetic.py",
-    "telegram_reader/build_test_fixtures.py": "roles/build_test_fixtures.py"
+    "telegram_reader/build_test_fixtures.py": "roles/build_test_fixtures.py",
+    "roles/containers/entrypoint.py": "roles/containers/entrypoint.py",
+    "roles/containers/Dockerfile": "roles/containers/Dockerfile",
+    "roles/containers/reader_bridge.py": "roles/containers/reader_bridge.py",
+    "roles/containers/prepare_collector.py": "roles/containers/prepare_collector.py"
   }
 }

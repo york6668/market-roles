@@ -41,6 +41,13 @@ def require_config(store: MessageStore) -> ReaderConfig:
 
 
 def open_bot_api() -> BotAPI:
+    if os.environ.get('BTC_READER_TOKEN_STDIN') == '1':
+        # Native Keychain adapter writes one token to the pipe. It never enters
+        # the image, command line, environment, source export or a log file.
+        token = sys.stdin.readline().strip()
+        if not token or len(token) > 512:
+            raise ReaderCommandError('native credential bridge supplied no valid token')
+        return BotAPI(token)
     return BotAPI(CredentialVault().bot_token())
 
 
