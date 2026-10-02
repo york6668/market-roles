@@ -145,8 +145,24 @@ class AnalysisRoleTests(unittest.TestCase):
         value['market_review'] = {'assessment_summary': 'Synthetic unchanged raw evidence remains independently limited.',
             'changes_since_hour': [], 'changes_since_deep': [],
             'deep_review': {'required': False, 'reasons': []}, 'patterns': []}
-        value.update(market_assessment=self.fixture['decision']['assessment']['outlook']['market_assessment'],
-            dispute_zones=self.fixture['decision']['assessment']['outlook']['dispute_zones'],
+        assessment = deepcopy(self.fixture['decision']['assessment']['outlook']['market_assessment'])
+        from test_closed_loop import forward
+        for market in assessment['markets']:
+            for horizon in market['horizons']:
+                horizon['forward'] = forward(self.fixture['market']['cutoff'])
+        zones = deepcopy(self.fixture['decision']['assessment']['outlook']['dispute_zones'])
+        for zone in zones:
+            boundary = {'formation': 'HISTORICAL_REFERENCE', 'validation': 'UNTESTED',
+                'evidence_window': {'start': zone['as_of'], 'end': zone['as_of']},
+                'identified_at': zone['as_of'], 'tested_at': None, 'horizon': zone['horizon'],
+                'basis': 'Synthetic retained candidate, without a new price test.',
+                'refs': zone['refs'], 'next_check': 'Verify an actual reaction at this candidate.'}
+            zone.update(role='HISTORICAL_ANCHOR', evidence_kind='UNKNOWN',
+                limitations='Synthetic historical candidate; no new formation evidence.',
+                boundary_review={'revision': 2, 'lower': deepcopy(boundary), 'upper': deepcopy(boundary),
+                                 'prior_zone_assessment': 'Preserve the historical candidate with its limitations.'})
+        value.update(market_assessment=assessment,
+            dispute_zones=zones,
             factor_checks={'items': [], 'summary': 'Synthetic factor interpretation remains limited.'})
         directory = Path(prepared['run']).parent
         market_file = directory / 'market-authored.json'; common.create(market_file, value)
@@ -156,6 +172,11 @@ class AnalysisRoleTests(unittest.TestCase):
             'side': side, 'findings': ['NO_MATERIAL_CHANGE'], 'refs': ['windows.4h.binance_spot_1h'],
             'explanation': 'Synthetic checks leave the recorded response unchanged.'}
             for side in ('upper_short','lower_spot')], 'main_evaluation': {'required': False, 'reasons': []}}
+        context = common.read(public['portfolio_context'])
+        personal['allocation_review'] = {'market_result_hash': public['market_result_hash'],
+            'allocation_decision_hash': None, 'fact_version': context['fact_version'],
+            'outcome': 'EVIDENCE_LIMITED', 'explanation': 'Legacy prose is not an assessed allocation decision.',
+            'limitations': ['Synthetic scenario has no revision 6 allocation decision.'], 'material': False}
         personal_file = directory / 'portfolio-authored.json'; common.create(personal_file, personal)
         output = self.native('run-advance', '--run', prepared['run'], '--stage', 'observe',
                              '--template', public['observation_template'], '--answers', personal_file)

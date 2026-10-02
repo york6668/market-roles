@@ -20,7 +20,7 @@ def main():
     os.environ['BTC_COLLECTOR_CONTRACT_PATH'] = str(reader / 'btc_evidence.py')
     os.environ.update(BOT_TOKEN='', CHAT_ID='')
     sys.dont_write_bytecode = True
-    sys.path[:0] = [str(root / 'roles'), str(root / 'roles/tests'), str(skill / 'scripts'),
+    sys.path[:0] = [str(root / 'scripts'), str(root / 'roles'), str(root / 'roles/tests'), str(skill / 'scripts'),
                    str(skill / 'tests'), str(reader), str(reader / 'tests')]
     counts = {name: 0 for name in ('network_attempts', 'credential_attempts', 'process_attempts',
         'non_temporary_db_attempts', 'non_temporary_write_attempts', 'real_fact_read_attempts')}
@@ -34,8 +34,12 @@ def main():
             'project_dir': str(sandbox), 'legacy_revision2_dir': str(sandbox / 'legacy'),
             'python': sys.executable, 'frozen_market_python': sys.executable}))
         os.environ['BTC_NODE_CONFIG'] = str(config)
+        os.environ['BTC_TEST_FIXTURE_DIR'] = str(sandbox / 'legacy')
+        os.environ['BTC_READER_TEST_FIXTURE_DIR'] = str(sandbox / 'reader-fixtures')
         subprocess.run([sys.executable, '-B', str(root / 'scripts/build_synthetic_fixtures.py'),
                         '--output-dir', str(sandbox / 'legacy')], check=True)
+        from build_reader_fixtures import build
+        build(sandbox / 'reader-fixtures')
         def temporary(path):
             return isinstance(path, int) or Path(os.fsdecode(path)).resolve().is_relative_to(sandbox)
         def audit(event, args):

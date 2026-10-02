@@ -31,6 +31,7 @@
     "telegram_reader/reader.py": "analysis/telegram_reader/reader.py",
     "telegram_reader/requirements.txt": "analysis/telegram_reader/requirements.txt",
     "telegram_reader/run_offline_tests.py": "analysis/telegram_reader/run_offline_tests.py",
+    "telegram_reader/seller_exhaustion.py": "core/market-collector/seller_exhaustion.py",
     "telegram_reader/store.py": "analysis/telegram_reader/store.py",
     "telegram_reader/sync_engine.py": "analysis/telegram_reader/sync_engine.py",
     "telegram_reader/test_btc_evidence.py": "core/market-collector/test_btc_evidence.py",
