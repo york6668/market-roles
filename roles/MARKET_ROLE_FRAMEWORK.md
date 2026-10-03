@@ -4,14 +4,14 @@
 
 「投资-btc」项目维护角色概览、策略资料和发布版本入口；私有 GitHub 仓库 `york6668/market-roles` 集中维护完整源码、工程框架、业务契约及测试。新版 Codex 云端环境 `market-roles` 用于开发和离线验证。程序、定时任务、数据和业务运行上下文落实在承担角色的机器上。云端项目用于工程维护与重建，不参与每轮本地定时执行。本框架不提供跨机器一键部署、自动接管、SSH 或 MCP 调度服务。
 
-## 角色与初始绑定
+## 角色与历史初始绑定
 
-| 角色 | 当前机器 | 程序与状态 | 运行方式 |
+| 角色 | 初始机器标识 | 初始程序与状态位置 | 初始运行方式 |
 | --- | --- | --- | --- |
 | collector | Mac-mini.local | `/Users/york/scripts/btc_push.py`；`~/.btc_push_state_tokyo.json` 及其相关 JSON、SQLite | 现有 `com.york.btcpush` LaunchAgent 常驻；采集线程持续运行，内部按小时调度 |
 | analysis | yorkdeMac-mini.local | reader 实际运行于 `~/Library/Application Support/btc-telegram-reader/app`；策略上下文位于 `/Users/york/Documents/ChatGPT/btc`，策略入口为 `btc-core-strategy/scripts/strategy_v4.py` | 原 reader 每小时第 10 分钟同步；Codex 本地小时分析任务 |
 
-机器名称用于识别，不能从名称推断在线状态。角色可以换机，也可以同机承担多个角色。任何具体操作先读该机器的实际配置；本表不是跨机器命令入口。analysis 的部署路径和测试入口见 [分析部署说明](../analysis/roles/ANALYSIS_DEPLOYMENT.md)。
+本表保留容器迁移前的角色来源，不表示当前加载路径、版本或服务状态。当前事实由目标节点配置、固定发布目录、容器镜像与实际挂载核对。机器名称用于识别，不能从名称推断在线状态；`.local` 仅是有条件的发现入口。角色可以换机，也可以同机承担多个角色。analysis 的部署路径和测试入口见 [分析部署说明](../analysis/roles/ANALYSIS_DEPLOYMENT.md)。
 
 采集角色负责公开数据、必要的机械指标计算、历史与质量记录、现有行情简报及证据附件。分析角色负责证据摄取和独立来源核验、市场判断、组合分析、报告及后续条件。采集程序不因角色整理新增策略决定或资产操作。
 
