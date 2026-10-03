@@ -60,7 +60,10 @@
     "roles/containers/entrypoint.py": "roles/containers/entrypoint.py",
     "roles/containers/Dockerfile": "roles/containers/Dockerfile",
     "roles/containers/reader_bridge.py": "roles/containers/reader_bridge.py",
-    "roles/containers/prepare_collector.py": "roles/containers/prepare_collector.py"
+    "roles/containers/prepare_collector.py": "roles/containers/prepare_collector.py",
+    "seller_exhaustion.py": "seller_exhaustion.py",
+    "test_seller_exhaustion.py": "test_seller_exhaustion.py",
+    "mappings/glassnode_seller_exhaustion.md": "mappings/glassnode_seller_exhaustion.md"
   },
   "analysis": {
     "roles/ANALYSIS_DEPLOYMENT.md": "analysis/roles/ANALYSIS_DEPLOYMENT.md",
@@ -117,6 +120,8 @@
     "roles/containers/entrypoint.py": "roles/containers/entrypoint.py",
     "roles/containers/Dockerfile": "roles/containers/Dockerfile",
     "roles/containers/reader_bridge.py": "roles/containers/reader_bridge.py",
-    "roles/containers/prepare_collector.py": "roles/containers/prepare_collector.py"
+    "roles/containers/prepare_collector.py": "roles/containers/prepare_collector.py",
+    "telegram_reader/seller_exhaustion.py": "seller_exhaustion.py",
+    "telegram_reader/mappings/glassnode_seller_exhaustion.md": "mappings/glassnode_seller_exhaustion.md"
   }
 }

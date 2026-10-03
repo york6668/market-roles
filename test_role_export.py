@@ -58,6 +58,16 @@ class RoleExportTests(unittest.TestCase):
         with self.assertRaisesRegex(FileNotFoundError, 'submodule'):
             export('analysis', self.destination, self.root)
 
+    def test_actual_roles_export_the_same_seller_contract(self):
+        repository = Path(__file__).resolve().parent
+        expected = (repository / 'seller_exhaustion.py').read_bytes()
+        for role, relative in (('collector', 'seller_exhaustion.py'),
+                               ('analysis', 'telegram_reader/seller_exhaustion.py')):
+            target = Path(self.temp.name) / role
+            export(role, target, repository)
+            self.assertEqual((target / relative).read_bytes(), expected)
+            self.assertFalse((target / relative).is_symlink())
+
 
 if __name__ == '__main__':
     unittest.main()
