@@ -10,15 +10,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('role', choices=('collector', 'reader'))
     parser.add_argument('--config', type=Path)
-    parser.add_argument('arguments', nargs='*')
-    args = parser.parse_args()
+    # The wrapped role owns its CLI options, including reader --asset. Only
+    # consume this wrapper's node configuration and retain the remaining order.
+    args, role_arguments = parser.parse_known_args()
     environment = dict(os.environ)
     if args.role == 'reader':
         environment.setdefault('BTC_READER_DATA_DIR', '/data/reader')
         environment.setdefault('BTC_READER_EVIDENCE_PATH', '/data/策略证据.md')
         environment['BTC_READER_TOKEN_STDIN'] = '1'
         target = Path('/app/telegram_reader/reader.py')
-        arguments = args.arguments or ['sync']
+        arguments = role_arguments or ['sync']
     else:
         if not args.config:
             parser.error('collector requires its existing node configuration')
@@ -36,7 +37,7 @@ def main():
                 raise ValueError('private environment cannot override public node settings')
             environment.update(credentials)
         target = Path('/app/btc_push.py')
-        arguments = args.arguments or config.get('arguments', [])
+        arguments = role_arguments or config.get('arguments', [])
     os.execve(sys.executable, [sys.executable, str(target), *arguments], environment)
 
 

@@ -2,8 +2,10 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from roles.export_role import export
+from roles.containers import entrypoint
 
 
 class RoleExportTests(unittest.TestCase):
@@ -67,6 +69,22 @@ class RoleExportTests(unittest.TestCase):
             export(role, target, repository)
             self.assertEqual((target / relative).read_bytes(), expected)
             self.assertFalse((target / relative).is_symlink())
+
+    def test_container_reader_forwards_options_and_keeps_default_sync(self):
+        for arguments, expected in ((['collector-observations', '--asset', 'all'],
+                                    ['collector-observations', '--asset', 'all']), ([], ['sync'])):
+            with patch('sys.argv', ['entrypoint.py', 'reader', *arguments]), patch.object(entrypoint.os, 'execve') as execute:
+                entrypoint.main()
+            self.assertEqual(execute.call_args.args[1][1:], ['/app/telegram_reader/reader.py', *expected])
+            self.assertEqual(execute.call_args.args[2]['BTC_READER_TOKEN_STDIN'], '1')
+
+    def test_container_collector_owns_config_and_preserves_role_arguments(self):
+        config = Path(self.temp.name) / 'node.json'
+        config.write_text(json.dumps({'environment': {}, 'arguments': ['configured-default']}))
+        for arguments, expected in ((['--once'], ['--once']), ([], ['configured-default'])):
+            with patch('sys.argv', ['entrypoint.py', 'collector', '--config', str(config), *arguments]), patch.object(entrypoint.os, 'execve') as execute:
+                entrypoint.main()
+            self.assertEqual(execute.call_args.args[1][1:], ['/app/btc_push.py', *expected])
 
 
 if __name__ == '__main__':
