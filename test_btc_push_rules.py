@@ -3411,6 +3411,13 @@ class ScheduledRetryTest(unittest.TestCase):
             active = patch.object(bot, name)
             active.start()
             self.addCleanup(active.stop)
+        # These tests drive a fake clock; public workers would outlive that
+        # clock and consume HTTP mocks belonging to later source tests.
+        for module, name in ((bot.market_public, "start_history_worker"),
+                             (bot.market_streams, "start_streams")):
+            active = patch.object(module, name)
+            active.start()
+            self.addCleanup(active.stop)
         active = patch.object(bot, "delivery_next_due_at", return_value=None)
         active.start()
         self.addCleanup(active.stop)
