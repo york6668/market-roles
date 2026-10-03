@@ -23,7 +23,7 @@ python3.11 -m venv .venv
 
 现有 Mac 环境可用其已安装的 Python 3.9 运行同一离线入口。该入口先验证导出工具，再分别导出两种角色到临时目录，运行采集测试、reader 测试及真实 `strategy_v4.py` 的合成恢复测试。`--role collector` 或 `--role analysis` 可缩小到受影响角色。测试使用临时状态、空发送凭据并阻断出站网络。真实服务、launchd、正式 reader 消费和 Codex 自动任务只在对应 Mac 上验证。
 
-Codex 云端环境准备阶段执行 `sh roles/cloud-setup.sh`，安装依赖后执行两角色及新数据层验证；脚本要求 Python 3.11、Docker daemon 和 Compose 实际可用，并启动隔离 MySQL 8.4，缺项明确失败。环境只选择本仓库、保持原访问范围，不添加正式发送凭据或本机数据。准备完成后保存并发布，再从已发布环境创建全新任务运行 `.venv/bin/python -B roles/validate_repository.py --with-data-service`。保存、发布和新任务通过分别确认。新任务先读本仓库 AGENTS、框架及对应核心方法，并核对当前仓库提交、核心 submodule 提交、实际方法入口和依赖；不得用旧任务结果代替新环境生效。
+Codex 云端环境准备阶段默认执行 `sh roles/cloud-setup.sh`，安装依赖并运行两角色的离线验证，明确报告数据服务尚未验证。需要完整数据服务验证时执行 `sh roles/cloud-setup.sh --with-data-service`，该模式要求 Python 3.11、Docker daemon 和 Compose 实际可用，并启动隔离 MySQL 8.4；缺项明确失败，不静默跳过。环境只选择本仓库、保持原访问范围，不添加正式发送凭据或本机数据。准备完成后保存并发布，再从已发布环境创建全新任务运行 `.venv/bin/python -B roles/validate_repository.py --with-data-service`。保存、发布和新任务通过分别确认。新任务先读本仓库 AGENTS、框架及对应核心方法，并核对当前仓库提交、核心 submodule 提交、实际方法入口和依赖；不得用旧任务结果代替新环境生效。
 
 ## 角色源码布局
 

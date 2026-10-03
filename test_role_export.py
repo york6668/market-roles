@@ -1,5 +1,8 @@
 import json
+import os
 from pathlib import Path
+import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -85,6 +88,24 @@ class RoleExportTests(unittest.TestCase):
             with patch('sys.argv', ['entrypoint.py', 'collector', '--config', str(config), *arguments]), patch.object(entrypoint.os, 'execve') as execute:
                 entrypoint.main()
             self.assertEqual(execute.call_args.args[1][1:], ['/app/btc_push.py', *expected])
+
+    def test_cloud_offline_preparation_does_not_require_docker_or_claim_its_validation(self):
+        root=Path(self.temp.name)/'cloud'; (root/'roles').mkdir(parents=True)
+        script=root/'roles/cloud-setup.sh'
+        shutil.copy2(Path(__file__).parent/'roles/cloud-setup.sh',script)
+        binary=root/'bin';binary.mkdir();(root/'.venv/bin').mkdir(parents=True)
+        python=binary/'python3.11';python.write_text('#!/bin/sh\nexit 0\n');python.chmod(0o755)
+        local=root/'.venv/bin/python';local.write_text('#!/bin/sh\nprintf "%s\\n" "$*" >> "$CHECK_ARGUMENTS"\n');local.chmod(0o755)
+        docker=binary/'docker';docker.write_text('#!/bin/sh\nexit 23\n');docker.chmod(0o755)
+        arguments=root/'arguments'
+        environment=dict(os.environ,PATH=str(binary)+':/usr/bin:/bin',CHECK_ARGUMENTS=str(arguments))
+        result=subprocess.run(['/bin/sh',str(script)],env=environment,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('NOT_RUN',result.stdout)
+        self.assertNotIn('--with-data-service',arguments.read_text())
+        result=subprocess.run(['/bin/sh',str(script),'--with-data-service'],env=environment,capture_output=True,text=True)
+        self.assertEqual(result.returncode,23)
+        self.assertNotIn('passed',result.stdout)
 
 
 if __name__ == '__main__':

@@ -2,30 +2,17 @@
 
 框架版本 `2026.10.01.2`，代码以私有仓库 `york6668/market-roles` 的指定提交为准。新版 Codex 云端环境用于开发和离线验证。本地机器拥有数据、游标、证据、策略、研究上下文、投递状态、资产事实和登录。初始分析机为 `yorkdeMac-mini.local`；采集机绑定由采集角色另行维护。
 
-## 当前实际安装
+## 当前运行位置与历史布局
 
-| 组件 | 当前入口或位置 |
-|---|---|
-| reader 开发代码 | `/Users/york/Documents/ChatGPT/btc/telegram_reader` |
-| reader 唯一运行代码 | `/Users/york/Library/Application Support/btc-telegram-reader/app/reader.py` |
-| reader Python | `/Users/york/Library/Application Support/btc-telegram-reader/.venv/bin/python` |
-| reader 状态 | `/Users/york/Library/Application Support/btc-telegram-reader/app/data/` |
-| reader 证据展示 | `/Users/york/Library/Application Support/btc-telegram-reader/策略证据.md` |
-| reader 调度 | `local.btc.telegram-reader`，每小时第 10 分钟 |
-| 策略入口 | `/Users/york/.agents/skills/btc-core-strategy/scripts/strategy_v4.py`，生产 `/usr/bin/python3` |
-| 当前方法 | 同一 Skill 的 `SKILL.md` 和 `references/`，内容 revision 6（旧记录兼容读取） |
-| 个人事实 | 项目 `资产配置.md`、`操作记录.md`、`纠正记录.md` |
-| 策略状态 | 项目 `.strategy/`；正式 Owner 为 `.strategy/v4/current` |
-| 模型调度 | 原 `BTC核心策略自动重评`（id `btc`），本地小时任务，Sol/high，按需 Astra/max |
-| reader 凭据 | 本机 Keychain：service `btc.telegram.reader`、account `bot_token` |
+实际运行以目标节点的 `node.json`、固定发布目录、Compose 配置、镜像和挂载为准。源码说明不保存机器的当前版本表；主机别名、同名路径和历史成功状态不能替代目标节点身份及本次操作核验。
 
-项目 `telegram_reader/data` 和 `策略证据.md` 链接到上述真实存储。`策略状态.md`、`当前预期计划.md` 链接到 v4 当前代的展示；`current` 自身链接到 `versions/<decision_id>`。
+Docker 节点通过宿主版本入口固定核心版本，reader 使用角色提交导出的只读源码与独立可写数据目录。`current` 仅在新运行进入时选择版本，既有运行与恢复继续其固定版本。宿主工具解释器、容器主解释器和历史冻结兼容解释器分别配置。兼容解释器由节点持久管理、固定版本并验证精确复算，不能长期依赖应用缓存路径。
 
-本机还有原 `local.btc.host-watchdog`（300 秒）和 `local.btc.pipeline-audit`（每小时第 20 分钟）。保留它们的现状，按其原安装独立恢复，不将其成功回执计作模型分析或报告送达；其运行状态在目标机器核对。
+旧宿主安装可能使用项目 `telegram_reader`、Application Support 下的 reader venv、LaunchAgent 和 `.strategy` 链接。这些是历史布局示例，不能覆盖当前节点配置。迁移保留其游标、数据库、事实和恢复依赖；源码与数据根分别确认，不能以源码只读为由使嵌套数据挂载不可写。
 
 ## 参考源码与本机配置
 
-`analysis-contract.json` 不包含机器路径。`machine-analysis.example.json` 是本机路径示例，没有凭据值。重建时修改自己的机器配置；`project_dir`、`skill_dir`、reader 数据与证据位置相互独立。`python` 用于本机工具及 reader 候选服务，可选择已安装 keyring 的 reader venv；策略生产入口仍使用该机选定的 `/usr/bin/python3`。不同 Python 的浮点求和不能改写冻结原始字节，必要时将实际可用的兼容解释器填入 `frozen_market_python`。
+`analysis-contract.json` 不包含机器路径。`machine-analysis.example.json` 是本机路径示例，没有凭据值。重建时修改自己的机器配置；`project_dir`、`skill_dir`、reader 数据与证据位置相互独立。`python` 用于本机工具及 reader 候选服务，可选择已安装 keyring 的 reader venv；策略生产入口使用节点选定的解释器或 Docker 转发入口。不同 Python 的浮点求和不能改写冻结原始字节，需要兼容时在 `frozen_market_python` 指向节点持久管理的解释器，并以 `frozen_market_python_version` 固定已验证版本。
 
 参考 JSON 格式为 `market-role-source-v1`，`role=analysis`。源码按显式文件表选择；排除 `.strategy`、数据库、日志、真实市场附件、个人事实文件、凭据、Codex 登录、自动任务 memory/history、旧真实报告 fixture 和 rollback 资料。合成测试状态由 `roles/generate_synthetic.py` 调用核心构造程序在临时目录生成，不随源码保存或导出。
 
