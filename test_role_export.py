@@ -1,14 +1,16 @@
 import json
+import io
 import os
 from pathlib import Path
 import shutil
 import subprocess
 import tempfile
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from roles.export_role import export
-from roles.containers import entrypoint
+from roles.containers import entrypoint, reader_bridge
 
 
 class RoleExportTests(unittest.TestCase):
@@ -80,6 +82,65 @@ class RoleExportTests(unittest.TestCase):
                 entrypoint.main()
             self.assertEqual(execute.call_args.args[1][1:], ['/app/telegram_reader/reader.py', *expected])
             self.assertEqual(execute.call_args.args[2]['BTC_READER_TOKEN_STDIN'], '1')
+
+    def test_reader_checkpoint_reports_phase_and_safe_service_failure(self):
+        private = 'credential-and-private-path-must-not-appear'
+        for error, message, reason in (
+            ('Conflict', 'another node writer is active; retry the same operation', 'WRITER_BUSY'),
+            ('Conflict', 'source changed during catalog import: '+private, 'SOURCE_CHANGED'),
+            ('OperationalError', private, 'SERVICE_REJECTED'),
+            (private, private, 'SERVICE_REJECTED'),
+        ):
+            output = io.StringIO()
+            result = SimpleNamespace(returncode=1, stdout=json.dumps(
+                {'ok':False,'error':error,'message':message}), stderr=private)
+            with patch.object(reader_bridge.subprocess, 'run', return_value=result), patch('sys.stderr', output):
+                with self.assertRaisesRegex(RuntimeError, 'do not acknowledge'):
+                    reader_bridge.checkpoint(['docker'], 'BEFORE_POLL')
+            event = json.loads(output.getvalue())
+            self.assertEqual(event['reason'], reason)
+            self.assertEqual(event['phase'], 'BEFORE_POLL')
+            self.assertTrue(event['started_at'].endswith('+00:00'))
+            self.assertTrue(event['finished_at'].endswith('+00:00'))
+            self.assertNotIn(private, output.getvalue())
+
+    def test_reader_checkpoint_rejects_malformed_or_unconfirmed_success(self):
+        for value in ('not-json', '[]', '{"ok":true}', '{"ok":true,"result":{"checkpointed":false}}'):
+            with patch.object(reader_bridge.subprocess, 'run', return_value=SimpleNamespace(
+                    returncode=0, stdout=value, stderr='')), patch('sys.stderr', io.StringIO()):
+                with self.assertRaises(RuntimeError):
+                    reader_bridge.checkpoint(['docker'], 'AFTER_POLL')
+        output = io.StringIO()
+        with patch.object(reader_bridge.subprocess, 'run', side_effect=FileNotFoundError(2, 'private path')), patch('sys.stderr', output):
+            with self.assertRaises(RuntimeError):
+                reader_bridge.checkpoint(['missing-docker'], 'BEFORE_POLL')
+        self.assertEqual(json.loads(output.getvalue())['reason'], 'PROCESS_START_FAILED')
+        self.assertNotIn('private path', output.getvalue())
+
+    def test_reader_bridge_never_polls_after_failed_checkpoint(self):
+        config = Path(self.temp.name)/'node.json'
+        config.write_text(json.dumps({'reader_code_dir':str(self.temp.name),'docker_service':{
+            'binary':'docker','project':'test','env_file':'node.env','compose_file':'compose.yaml',
+            'override_files':['override.json']}}))
+        vault = unittest.mock.Mock()
+        module = SimpleNamespace(CredentialVault=vault)
+        success = SimpleNamespace(returncode=0, stdout='{"ok":true,"result":{"checkpointed":true}}', stderr='')
+        failure = SimpleNamespace(returncode=1, stdout='{"ok":false,"error":"Conflict"}', stderr='')
+        for responses, calls, token_calls in (([failure], 1, 0), ([success, success, failure], 3, 1),
+                                              ([success, success, success], 3, 1)):
+            with patch.dict('sys.modules', {'bot_client':module}), patch('sys.argv', ['bridge','--config',str(config)]), \
+                    patch.object(reader_bridge.subprocess, 'run', side_effect=responses) as run, \
+                    patch('sys.stderr', io.StringIO()), patch.object(reader_bridge.sys, 'path', list(reader_bridge.sys.path)):
+                vault.reset_mock(); vault.return_value.bot_token.return_value = 'temporary-test-token'
+                if failure in responses:
+                    with self.assertRaises(RuntimeError): reader_bridge.main()
+                else: self.assertEqual(reader_bridge.main(), 0)
+                self.assertEqual(run.call_count, calls)
+                self.assertEqual(vault.return_value.bot_token.call_count, token_calls)
+                self.assertEqual(run.call_args_list[0].args[0][-7:], ['exec','-T','core','python','-m','btc_node','request'])
+                if token_calls:
+                    self.assertEqual(run.call_args_list[1].args[0][-8:], ['--profile','reader','run','--rm','-T','reader','reader','sync'])
+                    self.assertEqual(run.call_args_list[2].kwargs['input'], '{"method": "reader.checkpoint"}')
 
     def test_container_collector_owns_config_and_preserves_role_arguments(self):
         config = Path(self.temp.name) / 'node.json'
