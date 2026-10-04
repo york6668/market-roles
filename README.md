@@ -54,7 +54,7 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 
 运行 `git submodule update --init core/btc-core-strategy` 取得核心。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后运行 `python3 roles/validate_repository.py --role all`，包含完整核心与实际 reader 组合验证。云端仅作离线验证，模型、采集、发送、事实与数据仍在本机。
 
-当前核心新入口使用 content revision 6，将冻结的市场结果与整体配置决定分别交给报告和后续复核。旧正式状态、在办研究及 UNKNOWN 投递保留原身份；依赖升级和导出不生成新配置决定。
+当前核心新入口使用 content revision 7，将冻结的市场结果、个人资产风险评估与建议分别交给报告和后续复核。风险结论可以独立成立，需要应对时再附建议；原有机会分析继续保留。旧正式状态、在办研究及 UNKNOWN 投递保留原身份，旧配置建议不自动解释为新风险评估。
 
 ## Docker 节点
 

@@ -153,10 +153,10 @@ class AnalysisRoleTests(unittest.TestCase):
             for side in ('upper_short','lower_spot')], 'main_evaluation': {'required': False, 'reasons': []}}
         portfolio = common.read(public['portfolio_context'])
         personal['allocation_review'] = {'market_result_hash': public['market_result_hash'],
-            'allocation_decision_hash': None, 'fact_version': portfolio['fact_version'],
+            'portfolio_risk_hash': None, 'strategy_advice_hash': None, 'fact_version': portfolio['fact_version'],
             'outcome': 'EVIDENCE_LIMITED', 'material': False,
-            'explanation': 'Legacy report prose is not a formally adopted allocation decision.',
-            'limitations': ['A real revision six allocation assessment is pending.']}
+            'explanation': 'Legacy report prose is not a newly assessed asset risk result.',
+            'limitations': ['A real revision seven asset risk assessment is pending.']}
         personal_file = directory / 'portfolio-authored.json'; common.create(personal_file, personal)
         output = self.native('run-advance', '--run', prepared['run'], '--stage', 'observe',
                              '--template', public['observation_template'], '--answers', personal_file)
@@ -164,10 +164,11 @@ class AnalysisRoleTests(unittest.TestCase):
                   '--template', public['observation_template'], '--answers', personal_file)
         return output, replay
 
-    def test_revision6_prepare_preserves_revision5_owners_and_report_identity(self):
+    def test_revision7_prepare_preserves_revision5_owners_and_report_identity(self):
         original = common.facts(self.project)
         prepared = self.prep()
         ctx = common.read(prepared['context'])
+        self.assertEqual(ctx['revision'], 7)
         self.assertEqual(ctx['collector_observations']['assets']['BTC']['transport']['text_message_id'], 100)
         self.assertFalse(ctx['collector_observations']['assets']['VOO']['datasets']['stock_1h']['analysis_eligible'])
         self.assertNotIn('confirmed_account_facts', ctx)
@@ -178,6 +179,10 @@ class AnalysisRoleTests(unittest.TestCase):
     def test_restore_preserves_native_run_cursor_baselines_pending_unknown_and_delivered(self):
         prepared = self.prep()
         observed, replay = self.observe(prepared)
+        report = common.read(observed['report_context'])
+        self.assertIsNone(report['portfolio_risk'])
+        self.assertNotIn('allocation_decision', report)
+        self.assertEqual(report['applicability']['portfolio']['outcome'], 'EVIDENCE_LIMITED')
         run = common.read(prepared['run'])
         evidence = common.read(Path(run['evidence']) / 'evidence.json')
         source = next(s for s in evidence['sources'] if s['trust'] == 'PUBLIC_RAW')

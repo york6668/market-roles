@@ -22,7 +22,7 @@ Docker 节点通过宿主版本入口固定核心版本，reader 使用角色提
 python3 roles/export_role.py analysis /absolute/new/reference
 ```
 
-参考布局为 `telegram_reader/`、`skill/btc-core-strategy/`、`project-methods/`、`roles/`。可将当前 Skill 放入本机用户 skills 目录，或先通过本机配置指向参考目录做验证。方法引用相对实际 Skill 位置生成。内容 revision 1–5 原样兼容读取，新运行按 revision 6 方法准备；正式状态只有经过实际评估与采纳才进入新内容版本。保留原 `write-policy.json` 和运行上下文，不从旧叙述、rollback 或历史模板补造配置决定。
+参考布局为 `telegram_reader/`、`skill/btc-core-strategy/`、`project-methods/`、`roles/`。可将当前 Skill 放入本机用户 skills 目录，或先通过本机配置指向参考目录做验证。方法引用相对实际 Skill 位置生成。内容 revision 1–7 原样兼容读取，新运行按 revision 7 方法准备；正式状态只有经过实际评估与采纳才进入新内容版本。保留原 `write-policy.json` 和运行上下文，不从旧叙述、rollback 或历史配置建议补造风险评估。沿现有小时任务跟踪个人风险和报告消费的实际覆盖，不因安装或离线测试通过关闭自然验收。
 
 只读检查与真实策略入口：
 
@@ -98,7 +98,7 @@ helper 保留状态根内部链接并将绝对内部链接规范为相对链接�
 
 修复让每个标的最新报告的待下载附件优先进入同一个 20 件有界预算，其余待办保留并继续按原顺序处理；失败重试时间不绕过，来源质量不放宽。reader gap 导出含正文/附件身份和下载状态，策略冻结保留必要 report/bundle/transport 身份，排除 file_id、chat_id、采集 prose；身份不能提升事实可信度。VOO 的代理关系、UNKNOWN 复权与质量缺口不修成可分析。
 
-离线验收使用合成数据和临时目录，禁真实网络、凭据、发送和生产调度。通过参考包解包后运行 `roles/verify_analysis_reference.py`；它分别验证 reader、身份冻结和真实策略入口，包含 revision 6 market→observe 与 revision 5 正式状态保留、同一观察恢复、SQLite/WAL、内部链接、游标、研究待办和 PENDING/UNKNOWN/DELIVERED 保留。结果只证明源码与恢复接口；实际模型判断、真实发送、云端发布和自然小时运行各自需要实际证据。
+离线验收使用合成数据和临时目录，禁真实网络、凭据、发送和生产调度。通过参考包解包后运行 `roles/verify_analysis_reference.py`；它分别验证 reader、身份冻结和真实策略入口，包含 revision 7 market→observe 与 revision 5 正式状态保留、同一观察恢复、SQLite/WAL、内部链接、游标、研究待办和 PENDING/UNKNOWN/DELIVERED 保留。组合验证另运行导出的完整核心测试，覆盖 revision 7 的独立风险结果、可选建议、原有机会分析及报告绑定。结果只证明源码与恢复接口；实际模型判断、真实发送、云端发布和自然小时运行各自需要实际证据。
 
 ## 独立核心发布
 
