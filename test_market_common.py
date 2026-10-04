@@ -180,7 +180,9 @@ class CommonTest(unittest.TestCase):
 
     def test_asset_report_text_is_separate_and_macro_measurements_are_preserved(self):
         record = macro_record()
-        common_text = bot.build_common_report(record, NOW)
+        # Source freshness must use the same clock as this synthetic report.
+        with patch.object(bot.time, 'time', return_value=NOW):
+            common_text = bot.build_common_report(record, NOW)
         self.assertIn('公共宏观与事件简报', common_text)
         self.assertIn('US10Y', common_text)
         self.assertIn('2026-09-29', common_text)
