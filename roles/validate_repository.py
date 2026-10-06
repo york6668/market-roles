@@ -18,6 +18,8 @@ def main():
     parser.add_argument('--with-data-service', action='store_true', help='also require real MySQL/Docker/CLI/MCP recovery tests')
     parser.add_argument('--docker', default='docker')
     args = parser.parse_args()
+    if args.with_data_service and args.role == 'collector':
+        parser.error('--with-data-service requires --role analysis or all; data-service validation NOT_RUN')
     if sys.version_info < (3, 9):
         parser.error('Python 3.9 or later is required')
     selected = ('collector', 'analysis') if args.role == 'all' else (args.role,)

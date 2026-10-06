@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from types import SimpleNamespace
@@ -205,6 +206,22 @@ class RoleExportTests(unittest.TestCase):
         result=subprocess.run(['/bin/sh',str(script),'--with-data-service'],env=environment,capture_output=True,text=True)
         self.assertEqual(result.returncode,23)
         self.assertNotIn('passed',result.stdout)
+
+    def test_native_analysis_entrypoints_load_shared_helper(self):
+        root = Path(__file__).parent
+        for name in ('analysis_role.py','build_analysis_reference.py','verify_analysis_reference.py'):
+            result = subprocess.run([sys.executable,'-B',str(root/'analysis/roles'/name),'--help'],
+                                    capture_output=True,text=True,cwd=self.temp.name)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('usage:',result.stdout)
+
+    def test_collector_cannot_silently_skip_requested_data_service_validation(self):
+        root = Path(__file__).parent
+        result = subprocess.run([sys.executable,'-B',str(root/'roles/validate_repository.py'),
+            '--role','collector','--with-data-service'],capture_output=True,text=True,cwd=self.temp.name)
+        self.assertEqual(result.returncode,2)
+        self.assertIn('NOT_RUN',result.stderr)
+        self.assertNotIn('MARKET_ROLES_REBUILD_RESULT=',result.stdout)
 
 
 if __name__ == '__main__':
