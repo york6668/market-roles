@@ -5,9 +5,10 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import time
 
 
-def checkpoint(command, phase):
+def _checkpoint_attempt(command, phase):
     """Expose safe diagnostics without copying service output or credentials."""
     event = {'event': 'reader.checkpoint', 'phase': phase,
              'started_at': datetime.now(timezone.utc).isoformat()}
@@ -47,9 +48,23 @@ def checkpoint(command, phase):
                 reason = 'PROCESS_FAILED'
             event['reason'] = reason
     event['finished_at'] = datetime.now(timezone.utc).isoformat()
-    print(json.dumps(event, sort_keys=True), file=sys.stderr, flush=True)
-    if not event['ok']:
-        raise RuntimeError('reader checkpoint failed; do not acknowledge a newer Telegram offset')
+    return event
+
+
+def checkpoint(command, phase):
+    # A normal analysis stage can outlast the core's 30-second writer admission.
+    # Retry only that explicit rejection, within this same scheduled phase.
+    # Neither a failed poll nor an unconfirmed response permits another poll.
+    for attempt in range(1, 4):
+        event = _checkpoint_attempt(command, phase)
+        retry = event.get('reason') == 'WRITER_BUSY' and attempt < 3
+        event.update(attempt=attempt, retry=retry)
+        print(json.dumps(event, sort_keys=True), file=sys.stderr, flush=True)
+        if event['ok']:
+            return
+        if not retry:
+            raise RuntimeError('reader checkpoint failed; do not acknowledge a newer Telegram offset')
+        time.sleep(5)
 
 
 def main():

@@ -94,10 +94,15 @@ class RoleExportTests(unittest.TestCase):
             output = io.StringIO()
             result = SimpleNamespace(returncode=1, stdout=json.dumps(
                 {'ok':False,'error':error,'message':message}), stderr=private)
-            with patch.object(reader_bridge.subprocess, 'run', return_value=result), patch('sys.stderr', output):
+            with patch.object(reader_bridge.subprocess, 'run', return_value=result), patch('sys.stderr', output), \
+                    patch.object(reader_bridge.time, 'sleep') as sleep:
                 with self.assertRaisesRegex(RuntimeError, 'do not acknowledge'):
                     reader_bridge.checkpoint(['docker'], 'BEFORE_POLL')
-            event = json.loads(output.getvalue())
+            events = [json.loads(line) for line in output.getvalue().splitlines()]
+            self.assertEqual(len(events), 3 if reason == 'WRITER_BUSY' else 1)
+            self.assertEqual(sleep.call_count, len(events) - 1)
+            self.assertEqual([e['retry'] for e in events], [True]*(len(events)-1)+[False])
+            event = events[-1]
             self.assertEqual(event['reason'], reason)
             self.assertEqual(event['phase'], 'BEFORE_POLL')
             self.assertTrue(event['started_at'].endswith('+00:00'))
@@ -141,6 +146,39 @@ class RoleExportTests(unittest.TestCase):
                 if token_calls:
                     self.assertEqual(run.call_args_list[1].args[0][-8:], ['--profile','reader','run','--rm','-T','reader','reader','sync'])
                     self.assertEqual(run.call_args_list[2].kwargs['input'], '{"method": "reader.checkpoint"}')
+
+    def test_reader_bridge_retries_only_checkpoint_without_repeating_poll(self):
+        config = Path(self.temp.name)/'node.json'
+        config.write_text(json.dumps({'reader_code_dir':str(self.temp.name),'docker_service':{
+            'binary':'docker','project':'test','env_file':'node.env','compose_file':'compose.yaml'}}))
+        vault = unittest.mock.Mock()
+        vault.return_value.bot_token.return_value = 'temporary-test-token'
+        success = SimpleNamespace(returncode=0, stdout='{"ok":true,"result":{"checkpointed":true}}', stderr='')
+        busy = SimpleNamespace(returncode=1, stdout=json.dumps({'ok':False,'error':'Conflict',
+            'message':'another node writer is active; retry the same operation'}), stderr='')
+        # Rejections before/after the sole poll, or exhaustion before it.
+        for responses, polls in (([busy, success, success, busy, success], 1),
+                                 ([busy, busy, busy], 0)):
+            output = io.StringIO()
+            with patch.dict('sys.modules', {'bot_client':SimpleNamespace(CredentialVault=vault)}), \
+                    patch('sys.argv', ['bridge','--config',str(config)]), \
+                    patch.object(reader_bridge.subprocess, 'run', side_effect=responses) as run, \
+                    patch.object(reader_bridge.time, 'sleep'), patch('sys.stderr', output), \
+                    patch.object(reader_bridge.sys, 'path', list(reader_bridge.sys.path)):
+                vault.reset_mock()
+                if polls: self.assertEqual(reader_bridge.main(), 0)
+                else:
+                    with self.assertRaises(RuntimeError): reader_bridge.main()
+                self.assertEqual(vault.return_value.bot_token.call_count, polls)
+                calls = run.call_args_list
+                self.assertEqual(sum(c.args[0][-2:] == ['reader','sync'] for c in calls), polls)
+                for call in calls:
+                    if call.args[0][-1] == 'request':
+                        self.assertEqual(json.loads(call.kwargs['input']), {'method':'reader.checkpoint'})
+            events = [json.loads(line) for line in output.getvalue().splitlines()]
+            self.assertEqual(sum(e['ok'] for e in events), 2 if polls else 0)
+            self.assertTrue(all(e['phase'] == 'BEFORE_POLL' for e in events[:2]))
+            if polls: self.assertEqual([e['phase'] for e in events[2:]], ['AFTER_POLL']*2)
 
     def test_container_collector_owns_config_and_preserves_role_arguments(self):
         config = Path(self.temp.name) / 'node.json'

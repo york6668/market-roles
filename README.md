@@ -60,4 +60,6 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 
 两角色共用核心的 [Compose 与数据服务](core/btc-core-strategy/service/README.md)。`roles/containers/build.py collector|reader --docker <实际 Docker CLI> --tag <固定镜像标签>` 从源码白名单生成镜像，不复制运行数据。reader 由 `reader_bridge.py --config <现有节点配置>` 取用宿主 Keychain，经 stdin 执行原同步并在轮询前后保存 MySQL checkpoint。
 
+检查点遇到核心明确的 `WRITER_BUSY` 时，在同一计划调用、同一阶段内最多尝试三次，间隔五秒；每次失败及最终结果分别记录。核心的 30 秒写入准入保持不变。其他错误立即失败，轮询始终只执行一次；轮询前未确认保存时不读取凭据、不推进 Telegram 游标，轮询后重试只保存状态，不重复拉取或发送。
+
 采集节点先停止旧 writer，使用 `prepare_collector.py --node <原角色配置> --destination <新目录> --compose-file <核心 Compose> --image-tag <已验证版本>` 一致性备份、恢复和逐项核对实际 state_paths。该命令不采集、不发送、不启动服务；切换时仅启动 collector profile，保留原周期、公开来源和 Telegram 队列。回退必须停止容器并导出最新状态，UNKNOWN 不自动重发。首次及切换后恢复演练、实际运行、七个完整日本自然日的分析验收分别完成。
