@@ -145,8 +145,12 @@ class AnalysisRoleTests(unittest.TestCase):
                 horizon['forward'] = forward(item['as_of'])
         directory = Path(prepared['run']).parent
         market_file = directory / 'market-authored.json'; common.create(market_file, value)
+        candidate = self.native('run-advance', '--run', prepared['run'], '--stage', 'market',
+                                '--template', prepared['market_template'], '--answers', market_file, '--check-only')
+        # Generated authorship tests the real candidate binding, not model semantics.
+        self.assertEqual(common.read(candidate['market_candidate'])['payload'], value)
         public = self.native('run-advance', '--run', prepared['run'], '--stage', 'market',
-                             '--template', prepared['market_template'], '--answers', market_file)
+                             '--input', candidate['market_candidate'])
         personal = {'recommendation_checks': [{
             'side': side, 'findings': ['NO_MATERIAL_CHANGE'], 'refs': ['windows.4h.binance_spot_1h'],
             'explanation': 'Synthetic checks leave the recorded response unchanged.'}
