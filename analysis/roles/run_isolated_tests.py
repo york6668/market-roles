@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import types
 import unittest
+from unittest import mock
 from urllib.parse import unquote, urlsplit
 
 
@@ -39,7 +40,12 @@ def main():
         subprocess.run([sys.executable, str(root / 'scripts/build_synthetic_fixtures.py'),
                         '--output', str(sandbox / 'fixtures')], check=True)
         from generate_synthetic import build
-        build(sandbox / 'analysis.json')
+        # This generator reconstructs original revision3..8 native contracts.
+        # The production write floor is unchanged; new9 core entry cases run
+        # without this mock in the exported core suite.
+        with mock.patch('v4.storage.NEW_WRITE_REVISION',1), \
+                mock.patch('v4.research._guard_completed'):
+            build(sandbox / 'analysis.json')
         def temporary(path):
             return isinstance(path, int) or Path(os.fsdecode(path)).resolve().is_relative_to(sandbox)
         def audit(event, args):
@@ -72,7 +78,10 @@ def main():
         sys.addaudithook(audit)
         sys.modules['keyring'] = types.SimpleNamespace(get_password=no_credentials)
         suite = unittest.defaultTestLoader.loadTestsFromNames(['test_analysis_role','test_collector_provenance'])
-        result = unittest.TextTestRunner(verbosity=1).run(suite)
+        # These two named modules are explicitly historical native recovery
+        # regressions, including their original author/reader identities.
+        with mock.patch('v4.storage.NEW_WRITE_REVISION',1):
+            result = unittest.TextTestRunner(verbosity=1).run(suite)
         summary = {'tests_run': result.testsRun, 'failures': len(result.failures),
             'errors': len(result.errors), 'skipped': len(result.skipped), 'guards': counts}
         print('BTC_ANALYSIS_OFFLINE_RESULT=' + json.dumps(summary, sort_keys=True))

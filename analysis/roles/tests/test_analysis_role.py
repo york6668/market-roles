@@ -127,7 +127,12 @@ class AnalysisRoleTests(unittest.TestCase):
         self.assertEqual(status, 0, buffer.getvalue())
         return json.loads(buffer.getvalue())
 
-    def prep(self):
+    def prep(self, original_revision=None):
+        if original_revision is not None:
+            analysis_role.configure_paths(self.value)
+            run_flow.prepare(self.project/'.strategy/v4',self.project,'SYNTHETIC_ROLE_RUN',
+                self.project/'.strategy/v4/role-run',self.project/'frozen-market.json',
+                agent_id='SYNTHETIC_MAIN',workflow_revision=original_revision)
         return self.native('run-prepare', '--run-ref', 'SYNTHETIC_ROLE_RUN', '--agent', 'SYNTHETIC_MAIN',
                            '--directory', self.project / '.strategy/v4/role-run', '--market', self.project / 'frozen-market.json')
 
@@ -143,6 +148,9 @@ class AnalysisRoleTests(unittest.TestCase):
         for item in value['market_assessment']['markets']:
             for horizon in item['horizons']:
                 horizon['forward'] = forward(item['as_of'])
+        if common.read(prepared['context'])['revision']>=8:
+            from test_investment import public_research
+            public_research({'market_assessment':value['market_assessment']})
         directory = Path(prepared['run']).parent
         market_file = directory / 'market-authored.json'; common.create(market_file, value)
         candidate = self.native('run-advance', '--run', prepared['run'], '--stage', 'market',
@@ -161,6 +169,9 @@ class AnalysisRoleTests(unittest.TestCase):
             'outcome': 'EVIDENCE_LIMITED', 'material': False,
             'explanation': 'Legacy report prose is not a newly assessed asset risk result.',
             'limitations': ['A real revision seven asset risk assessment is pending.']}
+        if common.read(prepared['context'])['revision']>=8:
+            personal['allocation_review'].update(investment_decision_hash=None,issue_reviews=deepcopy(portfolio['open_investment_issues']))
+            personal['main_evaluation']={'required':True,'reasons':['Synthetic original upstream must complete the missing portfolio judgement.']}
         personal_file = directory / 'portfolio-authored.json'; common.create(personal_file, personal)
         output = self.native('run-advance', '--run', prepared['run'], '--stage', 'observe',
                              '--template', public['observation_template'], '--answers', personal_file)
@@ -168,11 +179,11 @@ class AnalysisRoleTests(unittest.TestCase):
                   '--template', public['observation_template'], '--answers', personal_file)
         return output, replay
 
-    def test_revision7_prepare_preserves_revision5_owners_and_report_identity(self):
+    def test_revision8_prepare_preserves_revision5_owners_and_report_identity(self):
         original = common.facts(self.project)
         prepared = self.prep()
         ctx = common.read(prepared['context'])
-        self.assertEqual(ctx['revision'], 7)
+        self.assertEqual(ctx['revision'], 8)
         self.assertEqual(ctx['collector_observations']['assets']['BTC']['transport']['text_message_id'], 100)
         self.assertFalse(ctx['collector_observations']['assets']['VOO']['datasets']['stock_1h']['analysis_eligible'])
         self.assertNotIn('confirmed_account_facts', ctx)
@@ -181,7 +192,8 @@ class AnalysisRoleTests(unittest.TestCase):
         self.assertEqual(self.native('--full', 'pin')['assessment']['revision'], 5)
 
     def test_restore_preserves_native_run_cursor_baselines_pending_unknown_and_delivered(self):
-        prepared = self.prep()
+        prepared = self.prep(original_revision=7)
+        self.assertEqual(common.read(prepared['context'])['revision'],7)
         observed, replay = self.observe(prepared)
         report = common.read(observed['report_context'])
         self.assertIsNone(report['portfolio_risk'])
@@ -249,6 +261,17 @@ class AnalysisRoleTests(unittest.TestCase):
         self.assertEqual((restored / 'current').resolve(), (restored / 'versions/a').resolve())
         with sqlite3.connect(restored / 'reader.sqlite3') as db:
             self.assertEqual(db.execute('SELECT value FROM cursor').fetchone()[0], 987)
+
+    def test_revision8_native_public_and_personal_stage_preserves_original_owner(self):
+        prepared=self.prep()
+        observed,_=self.observe(prepared)
+        context=common.read(observed['report_context'])
+        self.assertTrue(observed['main_eligible'])
+        self.assertIsNone(context['investment_decision'])
+        self.assertEqual(context['applicability']['portfolio']['outcome'],'REVISE')
+        self.assertEqual(self.native('--full','pin')['assessment']['revision'],5)
+        self.assertNotIn('recorded_policy_inputs',common.read(prepared['context']))
+        self.assertNotIn('investment_feedback',common.read(prepared['context']))
 
 
 if __name__ == '__main__':

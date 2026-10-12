@@ -22,7 +22,7 @@ Docker 节点通过宿主版本入口固定核心版本，reader 使用角色提
 python3 roles/export_role.py analysis /absolute/new/reference
 ```
 
-参考布局为 `telegram_reader/`、`skill/btc-core-strategy/`、`project-methods/`、`roles/`。可将当前 Skill 放入本机用户 skills 目录，或先通过本机配置指向参考目录做验证。方法引用相对实际 Skill 位置生成。内容 revision 1–7 原样兼容读取，新运行按 revision 7 方法准备；正式状态只有经过实际评估与采纳才进入新内容版本。保留原 `write-policy.json` 和运行上下文，不从旧叙述、rollback 或历史配置建议补造风险评估。沿现有小时任务跟踪个人风险和报告消费的实际覆盖，不因安装或离线测试通过关闭自然验收。
+参考布局为 `telegram_reader/`、`skill/btc-core-strategy/`、`project-methods/`、`roles/`。可将当前 Skill 放入本机用户 skills 目录，或先通过本机配置指向参考目录做验证。方法引用相对实际 Skill 位置生成。内容 revision 1–9 原样兼容读取，新运行按所安装核心版本的方法准备；revision 9 具备完整组合取舍、事前记录及源绑定反馈接口；正式状态只有经过实际评估与采纳才进入新内容版本。保留原 `write-policy.json` 和运行上下文，不从旧叙述、rollback 或历史配置建议补造风险评估。沿现有小时任务跟踪个人风险和报告消费的实际覆盖，不因安装或离线测试通过关闭自然验收。
 
 只读检查与真实策略入口：
 
@@ -103,3 +103,7 @@ helper 保留状态根内部链接并将绝对内部链接规范为相对链接�
 ## 独立核心发布
 
 核心版本由 `core/btc-core-strategy` 的 Git 提交确定。使用核心的 `scripts/release.py` 与本机节点配置安装，正式模板见核心 `tasks/hourly.md`，恢复方式见 Skill 的 `references/releases.md`。Skill、代码、方法和测试一起发布，不单独复制 Skill 文件夹。旧 `build_analysis_reference.py` 仍可生成角色源码包，但改从本仓库及固定 submodule 导出，不读取资产项目中的核心副本。
+
+## 投资决策候选与采用
+
+完整方法由核心 references/investment-process.md 持有。两套输入在原组合决定处汇合，reader保持公开数据职责；不把个人账本送入公开市场阶段，不将模拟或建议投射为实际成交。源绑定账本和评价属于个人状态，沿既有备份/恢复目录维护，不随源码导出。用户要求手机报告验收后采用时，先在工作区验证代码及完整报告候选；Git/submodule发布、安装和current切换是后续明确步骤。未验收的候选不得提前切换生产，也不为验收新增市场通知或任务。
