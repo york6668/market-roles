@@ -52,7 +52,7 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 
 完整策略、Skill、研究嗅探、状态、报告与恢复由私有仓库 `york6668/btc-core-strategy` 维护。本仓库以 `core/btc-core-strategy` submodule 固定提交；reader 由本仓库维护，采集与 ETF 共享证据来自固定 `core/market-collector`。
 
-运行 `git submodule update --init core/btc-core-strategy core/market-collector` 取得固定依赖，复用当前环境已有的 GitHub 认证。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后运行 `python3 roles/validate_repository.py --role all`，包含完整核心与实际 reader 组合验证。云端仅作离线验证，模型、采集、发送、事实与数据仍在本机。ETF 匿名持仓更新先安装 reader 共享契约，再更新采集端；保持节点状态与小时调度，通过自然运行核验。
+运行 `git submodule update --init core/btc-core-strategy core/market-collector` 取得固定依赖，复用当前环境已有的 GitHub 认证。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后运行 `python3 roles/validate_repository.py --role all`，包含完整核心与实际 reader 组合验证。云端仅作离线验证，模型、采集、发送、事实与数据仍在本机。ETF 匿名持仓及 TFTC 美元流量更新先安装 reader 共享契约，再更新采集端；保持节点状态与小时调度，通过自然运行核验。
 
 核心候选新入口使用 content revision 9，在既有 Owner 中完成投资者政策、独立市场、组合风险与机会的总体取舍，并按实际版本交给报告和后续复核。生产采用版本由节点 current 实际指针确认；源码候选不等于已采用。风险结论可以独立成立，需要应对时再附建议；原有机会分析继续保留。旧正式状态、在办研究及 UNKNOWN 投递保留原身份，旧配置建议不自动解释为新风险评估。
 

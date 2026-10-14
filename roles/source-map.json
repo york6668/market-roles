@@ -124,6 +124,8 @@
     "telegram_reader/seller_exhaustion.py": "seller_exhaustion.py",
     "telegram_reader/mappings/glassnode_seller_exhaustion.md": "mappings/glassnode_seller_exhaustion.md",
     "telegram_reader/btc_etf.py": "core/market-collector/btc_etf.py",
-    "telegram_reader/mappings/bitbo_us_spot_etf.md": "core/market-collector/mappings/bitbo_us_spot_etf.md"
+    "telegram_reader/btc_etf_flow.py": "core/market-collector/btc_etf_flow.py",
+    "telegram_reader/mappings/bitbo_us_spot_etf.md": "core/market-collector/mappings/bitbo_us_spot_etf.md",
+    "telegram_reader/mappings/tftc_us_spot_etf_flow.md": "core/market-collector/mappings/tftc_us_spot_etf_flow.md"
   }
 }

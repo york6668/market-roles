@@ -1,0 +1,1 @@
+../../../core/market-collector/mappings/tftc_us_spot_etf_flow.md
