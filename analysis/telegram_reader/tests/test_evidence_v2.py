@@ -177,6 +177,58 @@ class V2ContractTests(unittest.TestCase):
 
 
 class V2CLIReplayTests(unittest.TestCase):
+    def test_three_asset_batch_budget_preserves_complete_observations(self):
+        for history_hours, should_fit in ((4500, True), (9500, False)):
+            with self.subTest(history_hours=history_hours), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                db = root / 'messages.sqlite3'
+                with MessageStore(db) as store:
+                    store.save_config(ReaderConfig(chat_id=-1001, reader_bot_id=1, configured_at_utc=GENERATED_AT))
+                with contextlib.closing(EvidenceReader(root / 'collector_evidence.sqlite3', -1001)) as collector:
+                    for index, asset in enumerate(('BTC', 'QQQ', 'VOO')):
+                        bundle, text = generated(asset, etf_holdings=True)
+                        # Valid raw histories exercise combined export limits
+                        # without changing attachment identities or truncating data.
+                        history = bundle['measurements']['derivative_cvd_long']
+                        template = history['rows'][-1]
+                        history['rows'] = [dict(template,
+                            observed_ms=END_MS - n * HOUR + HOUR - 1,
+                            open_time=END_MS - n * HOUR,
+                            close_time=END_MS - n * HOUR + HOUR - 1)
+                            for n in range(history_hours, 0, -1)]
+                        history.update(flow_summary(history['rows'], END_MS + 10000))
+                        rehash(bundle)
+                        validation = evidence.validate_bundle(bundle, text)
+                        self.assertNotEqual('rejected', validation['status'], validation)
+                        self.assertNotIn('derivative_cvd_long', validation['dataset_reasons'])
+                        encoded = evidence.encode_bundle(bundle)
+                        parent = 100 + index * 10
+                        for uid, message in ((parent, {'message_id': parent, 'text': text}),
+                                             (parent + 1, {'message_id': parent + 1,
+                                               'reply_to_message': {'message_id': parent},
+                                               'document': {'file_id': str(parent), 'file_name': asset + '.json',
+                                                            'mime_type': 'application/json', 'file_size': len(encoded)}})):
+                            collector.ingest_update({'update_id': uid, 'channel_post': dict(message,
+                                date=END_MS // 1000 + uid, chat={'id': -1001, 'type': 'channel'})})
+                        collector.process_pending(lambda _: encoded)
+                    before = '\n'.join(collector.db.iterdump())
+                    with self.assertRaisesRegex(ValueError, 'observations_output_size_limit'):
+                        collector.observations(latest_only=True, asset='all', max_output_bytes=4 * 1024 * 1024)
+                    if should_fit:
+                        rows = reader.collector_observations(db, 'all')
+                        size = len((json.dumps(rows, ensure_ascii=False, sort_keys=True) + '\n').encode('utf-8'))
+                        self.assertGreater(size, 4 * 1024 * 1024)
+                        self.assertLessEqual(size, 8 * 1024 * 1024)
+                        self.assertEqual(['BTC', 'QQQ', 'VOO'], [row['asset_id'] for row in rows])
+                        self.assertTrue(all(row['report_id'] == 'fixture:v2:' + row['asset_id'] for row in rows))
+                        self.assertTrue(all(len(row['datasets']['derivative_cvd_long']['rows']) == history_hours for row in rows))
+                        self.assertAlmostEqual(12.00000012, rows[0]['datasets']['etf']['values']['holdings_btc'])
+                        self.assertIsNone(rows[0]['datasets']['etf']['values']['flow_1d_usd'])
+                    else:
+                        with self.assertRaisesRegex(reader.ReaderCommandError, '辅助观察导出失败'):
+                            reader.collector_observations(db, 'all')
+                    self.assertEqual(before, '\n'.join(collector.db.iterdump()))
+
     def test_generated_v1_v2_reader_cli_latest_gap_edit_and_revalidation(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
