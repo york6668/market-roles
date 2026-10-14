@@ -66,15 +66,18 @@ class RoleExportTests(unittest.TestCase):
         with self.assertRaisesRegex(FileNotFoundError, 'submodule'):
             export('analysis', self.destination, self.root)
 
-    def test_actual_roles_export_the_same_seller_contract(self):
+    def test_actual_roles_export_shared_contracts_and_keep_reader_receipt_repairs(self):
         repository = Path(__file__).resolve().parent
-        expected = (repository / 'seller_exhaustion.py').read_bytes()
-        for role, relative in (('collector', 'seller_exhaustion.py'),
-                               ('analysis', 'telegram_reader/seller_exhaustion.py')):
+        for role, prefix in (('collector', ''), ('analysis', 'telegram_reader/')):
             target = Path(self.temp.name) / role
             export(role, target, repository)
-            self.assertEqual((target / relative).read_bytes(), expected)
-            self.assertFalse((target / relative).is_symlink())
+            for name in ('seller_exhaustion.py', 'btc_evidence.py', 'btc_etf.py'):
+                expected = (repository / 'core/market-collector' / name).read_bytes()
+                self.assertEqual((target / (prefix + name)).read_bytes(), expected)
+                self.assertFalse((target / (prefix + name)).is_symlink())
+            if role == 'analysis':
+                self.assertEqual((target / (prefix + 'btc_evidence_reader.py')).read_bytes(),
+                                 (repository / 'btc_evidence_reader.py').read_bytes())
 
     def test_container_reader_forwards_options_and_keeps_default_sync(self):
         for arguments, expected in ((['collector-observations', '--asset', 'all'],

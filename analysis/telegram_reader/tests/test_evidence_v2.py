@@ -13,7 +13,7 @@ import btc_evidence as evidence
 import market_evidence_v2 as v2
 from btc_collection import settled_window
 from btc_evidence_reader import EvidenceReader
-from collector_replay_fixture import END_MS, GENERATED_AT, make_payload
+from collector_replay_fixture import END_MS, GENERATED_AT, make_payload, holdings_only_record
 from collector_v2_reader import sanitize_observation
 from market_assets import INSTRUMENTS
 from market_history import DAY, HOUR, flow_summary
@@ -24,7 +24,7 @@ import reader
 from store import MessageStore
 
 
-def generated(asset, version=2):
+def generated(asset, version=2, etf_holdings=False):
     payload = make_payload()
     payload.update(instrument=INSTRUMENTS[asset].identity(), evidence_version=version)
     cutoff = END_MS + 10000
@@ -77,6 +77,8 @@ def generated(asset, version=2):
         history[name] = _record(contract[0], contract[1], rows, contract[2], target=asset, relation=contract[3])
         history[name]['calculated_at_ms'] = cutoff
     payload['public_history'] = history
+    if asset == 'BTC' and etf_holdings:
+        payload['public_records']['etf'] = holdings_only_record()
     text = '📊 ' + asset + ' 离线完整格式验证（合成样本）'
     bundle = evidence.build_bundle(payload, text, 'fixture:v%d:%s' % (version, asset), GENERATED_AT)
     return bundle, text
@@ -88,6 +90,14 @@ def rehash(bundle):
 
 
 class V2ContractTests(unittest.TestCase):
+    def test_bitbo_holdings_with_missing_flow_survives_real_sanitizer(self):
+        bundle, text = generated('BTC', etf_holdings=True)
+        clean = sanitize_observation(evidence.auxiliary_observation(bundle, text))
+        self.assertNotIn('etf', clean['dataset_reasons'])
+        self.assertAlmostEqual(12.00000012, clean['datasets']['etf']['values']['holdings_btc'])
+        self.assertIsNone(clean['datasets']['etf']['values']['flow_1d_usd'])
+        self.assertNotIn('public_etf_history', clean['sources'])
+
     def test_generated_v1_and_v2_all_assets_roundtrip(self):
         for version in (1, 2):
             for asset in ('BTC', 'QQQ', 'VOO'):

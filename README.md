@@ -27,7 +27,7 @@ Codex 云端环境准备阶段默认执行 `sh roles/cloud-setup.sh`，安装依
 
 ## 角色源码布局
 
-采集模块保持在仓库根目录；分析专属 reader 和部署入口位于 `analysis/`。共享模块及恢复工具只在根目录维护一份；分析目录中的相对符号链接供仓库内阅读和测试使用。导出时按文件映射生成普通文件，目标机器不依赖仓库外的代码目录。
+采集源码由独立 `york6668/market-collector` 维护，`core/market-collector` 固定其提交，采集导出使用该核心自己的文件表。分析专属 reader 和部署入口位于 `analysis/`；ETF 共享证据契约也从同一固定采集版本导出，reader 的接收时间、失败记录和节点桥接实现继续保留在本仓。分析目录中的相对符号链接供仓库内阅读和测试使用。导出时按文件映射生成普通文件，目标机器不依赖仓库外的代码目录。
 
 ```sh
 python3 -B roles/export_role.py collector /absolute/new/collector-source
@@ -50,9 +50,9 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 
 ## 独立核心版本
 
-完整策略、Skill、研究嗅探、状态、报告与恢复由私有仓库 `york6668/btc-core-strategy` 维护。本仓库以 `core/btc-core-strategy` submodule 固定提交；采集与 reader 仍由本仓库维护。
+完整策略、Skill、研究嗅探、状态、报告与恢复由私有仓库 `york6668/btc-core-strategy` 维护。本仓库以 `core/btc-core-strategy` submodule 固定提交；reader 由本仓库维护，采集与 ETF 共享证据来自固定 `core/market-collector`。
 
-运行 `git submodule update --init core/btc-core-strategy` 取得核心。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后运行 `python3 roles/validate_repository.py --role all`，包含完整核心与实际 reader 组合验证。云端仅作离线验证，模型、采集、发送、事实与数据仍在本机。
+运行 `git submodule update --init core/btc-core-strategy core/market-collector` 取得固定依赖，复用当前环境已有的 GitHub 认证。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后运行 `python3 roles/validate_repository.py --role all`，包含完整核心与实际 reader 组合验证。云端仅作离线验证，模型、采集、发送、事实与数据仍在本机。ETF 匿名持仓更新先安装 reader 共享契约，再更新采集端；保持节点状态与小时调度，通过自然运行核验。
 
 核心候选新入口使用 content revision 9，在既有 Owner 中完成投资者政策、独立市场、组合风险与机会的总体取舍，并按实际版本交给报告和后续复核。生产采用版本由节点 current 实际指针确认；源码候选不等于已采用。风险结论可以独立成立，需要应对时再附建议；原有机会分析继续保留。旧正式状态、在办研究及 UNKNOWN 投递保留原身份，旧配置建议不自动解释为新风险评估。
 

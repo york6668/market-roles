@@ -100,11 +100,11 @@ class AnalysisRoleTests(unittest.TestCase):
                 p.start(); self.addCleanup(p.stop)
         self.seed_reader()
 
-    def seed_reader(self):
+    def seed_reader(self, holdings_only=False, start_id=100):
         updates, documents = [], {}
         for index, asset in enumerate(('BTC','QQQ','VOO')):
-            parent = 100 + index * 2
-            bundle, text = generated(asset)
+            parent = start_id + index * 2
+            bundle, text = generated(asset, etf_holdings=holdings_only)
             raw = btc_evidence.encode_bundle(bundle); documents[str(parent)] = raw
             chat = {'id': -100123, 'type': 'channel'}
             updates.extend([
@@ -119,6 +119,17 @@ class AnalysisRoleTests(unittest.TestCase):
         with MessageStore(self.reader_data / 'messages.sqlite3') as store:
             store.save_config(config)
             synchronize(store=store, source=Source(), config=config)
+
+    def test_bitbo_holdings_reach_btc_analysis_without_current_flows(self):
+        self.seed_reader(holdings_only=True, start_id=1100)
+        captured = collector.capture(self.project)
+        collector.validate(captured)
+        btc = captured['assets']['BTC']
+        self.assertEqual('AUXILIARY', btc['status'])
+        self.assertAlmostEqual(12.00000012, btc['datasets']['etf']['values']['holdings_btc'])
+        self.assertIsNone(btc['datasets']['etf']['values']['flow_1d_usd'])
+        self.assertEqual('Bitbo', btc['sources']['public_etf']['venue'])
+        self.assertNotIn('public_etf_history', btc['sources'])
 
     def native(self, *args):
         buffer = io.StringIO()

@@ -22,8 +22,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def export(role, destination, root=ROOT):
     root = Path(root).resolve()
-    entries = json.loads((root / 'roles/source-map.json').read_text())[role]
-    entries = dict(entries)
+    if role == 'collector':
+        manifest = root / 'core/market-collector/roles/collector-source-files.json'
+        if not manifest.is_file():
+            raise FileNotFoundError('initialize pinned collector: git submodule update --init core/market-collector')
+        entries = {name: 'core/market-collector/' + name for name in json.loads(manifest.read_text())}
+    else:
+        entries = dict(json.loads((root / 'roles/source-map.json').read_text())[role])
     dependency = root / 'core/btc-core-strategy'
     if role == 'analysis' and (root / '.gitmodules').is_file():
         manifest = dependency / 'export-manifest.json'

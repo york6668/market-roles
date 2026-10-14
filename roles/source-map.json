@@ -80,10 +80,10 @@
     "telegram_reader/README.md": "analysis/telegram_reader/README.md",
     "telegram_reader/bot_client.py": "analysis/telegram_reader/bot_client.py",
     "telegram_reader/btc_collection.py": "btc_collection.py",
-    "telegram_reader/btc_evidence.py": "btc_evidence.py",
+    "telegram_reader/btc_evidence.py": "core/market-collector/btc_evidence.py",
     "telegram_reader/btc_evidence_reader.py": "btc_evidence_reader.py",
     "telegram_reader/collector_v2_reader.py": "collector_v2_reader.py",
-    "telegram_reader/docs/BTC_COLLECTOR_EVIDENCE_V1.md": "analysis/telegram_reader/docs/BTC_COLLECTOR_EVIDENCE_V1.md",
+    "telegram_reader/docs/BTC_COLLECTOR_EVIDENCE_V1.md": "core/market-collector/docs/BTC_COLLECTOR_EVIDENCE_V1.md",
     "telegram_reader/docs/MARKET_COLLECTOR_EVIDENCE_V1.md": "analysis/telegram_reader/docs/MARKET_COLLECTOR_EVIDENCE_V1.md",
     "telegram_reader/evidence.py": "analysis/telegram_reader/evidence.py",
     "telegram_reader/market_assets.py": "market_assets.py",
@@ -99,9 +99,9 @@
     "telegram_reader/run_offline_tests.py": "analysis/telegram_reader/run_offline_tests.py",
     "telegram_reader/store.py": "analysis/telegram_reader/store.py",
     "telegram_reader/sync_engine.py": "analysis/telegram_reader/sync_engine.py",
-    "telegram_reader/test_btc_evidence.py": "test_btc_evidence.py",
+    "telegram_reader/test_btc_evidence.py": "core/market-collector/test_btc_evidence.py",
     "telegram_reader/test_btc_evidence_reader.py": "test_btc_evidence_reader.py",
-    "telegram_reader/tests/collector_replay_fixture.py": "analysis/telegram_reader/tests/collector_replay_fixture.py",
+    "telegram_reader/tests/collector_replay_fixture.py": "core/market-collector/tests/collector_replay_fixture.py",
     "telegram_reader/tests/reader_replay_fixture.py": "analysis/telegram_reader/tests/reader_replay_fixture.py",
     "telegram_reader/tests/test_bot_client.py": "analysis/telegram_reader/tests/test_bot_client.py",
     "telegram_reader/tests/test_collector_cli.py": "analysis/telegram_reader/tests/test_collector_cli.py",
@@ -122,6 +122,8 @@
     "roles/containers/reader_bridge.py": "roles/containers/reader_bridge.py",
     "roles/containers/prepare_collector.py": "roles/containers/prepare_collector.py",
     "telegram_reader/seller_exhaustion.py": "seller_exhaustion.py",
-    "telegram_reader/mappings/glassnode_seller_exhaustion.md": "mappings/glassnode_seller_exhaustion.md"
+    "telegram_reader/mappings/glassnode_seller_exhaustion.md": "mappings/glassnode_seller_exhaustion.md",
+    "telegram_reader/btc_etf.py": "core/market-collector/btc_etf.py",
+    "telegram_reader/mappings/bitbo_us_spot_etf.md": "core/market-collector/mappings/bitbo_us_spot_etf.md"
   }
 }
