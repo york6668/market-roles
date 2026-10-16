@@ -126,6 +126,7 @@
     "telegram_reader/btc_etf.py": "core/market-collector/btc_etf.py",
     "telegram_reader/btc_etf_flow.py": "core/market-collector/btc_etf_flow.py",
     "telegram_reader/mappings/bitbo_us_spot_etf.md": "core/market-collector/mappings/bitbo_us_spot_etf.md",
+    "telegram_reader/mappings/coinboss_us_spot_etf_flow.md": "core/market-collector/mappings/coinboss_us_spot_etf_flow.md",
     "telegram_reader/mappings/tftc_us_spot_etf_flow.md": "core/market-collector/mappings/tftc_us_spot_etf_flow.md"
   }
 }

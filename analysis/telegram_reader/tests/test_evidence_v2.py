@@ -24,7 +24,7 @@ import reader
 from store import MessageStore
 
 
-def generated(asset, version=2, etf_holdings=False, etf_flows=False):
+def generated(asset, version=2, etf_holdings=False, etf_flows=False, flow_venue='TFTC'):
     payload = make_payload()
     payload.update(instrument=INSTRUMENTS[asset].identity(), evidence_version=version)
     cutoff = END_MS + 10000
@@ -81,9 +81,11 @@ def generated(asset, version=2, etf_holdings=False, etf_flows=False):
         payload['public_records']['etf'] = holdings_only_record()
     if asset == 'BTC' and etf_flows:
         from collector_replay_fixture import anonymous_etf_record
-        payload['public_records']['etf'] = anonymous_etf_record()
+        payload['public_records']['etf'] = anonymous_etf_record(flow_venue)
     text = '📊 ' + asset + ' 离线完整格式验证（合成样本）'
-    bundle = evidence.build_bundle(payload, text, 'fixture:v%d:%s' % (version, asset), GENERATED_AT)
+    report_id = 'fixture:v%d:%s' % (version, asset)
+    if flow_venue != 'TFTC': report_id += ':' + flow_venue
+    bundle = evidence.build_bundle(payload, text, report_id, GENERATED_AT)
     return bundle, text
 
 
@@ -93,15 +95,16 @@ def rehash(bundle):
 
 
 class V2ContractTests(unittest.TestCase):
-    def test_tftc_flows_and_bitbo_holdings_survive_real_sanitizer(self):
-        bundle, text = generated('BTC', etf_flows=True)
-        clean = sanitize_observation(evidence.auxiliary_observation(bundle, text))
-        self.assertNotIn('etf', clean['dataset_reasons'])
-        values = clean['datasets']['etf']['values']
-        self.assertAlmostEqual(30.3703701, values['flow_30d_usd'])
-        self.assertAlmostEqual(12.00000012, values['holdings_btc'])
-        self.assertEqual('TFTC', clean['sources']['public_etf_history']['venue'])
-        self.assertEqual('Bitbo', clean['sources']['public_etf']['venue'])
+    def test_anonymous_flows_and_bitbo_holdings_survive_real_sanitizer(self):
+        for venue, amount in [('TFTC', 30.3703701), ('CoinBoss', 36000000)]:
+            bundle, text = generated('BTC', etf_flows=True, flow_venue=venue)
+            clean = sanitize_observation(evidence.auxiliary_observation(bundle, text))
+            self.assertNotIn('etf', clean['dataset_reasons'])
+            values = clean['datasets']['etf']['values']
+            self.assertAlmostEqual(amount, values['flow_30d_usd'])
+            self.assertAlmostEqual(12.00000012, values['holdings_btc'])
+            self.assertEqual(venue, clean['sources']['public_etf_history']['venue'])
+            self.assertEqual('Bitbo', clean['sources']['public_etf']['venue'])
 
     def test_bitbo_holdings_with_missing_flow_survives_real_sanitizer(self):
         bundle, text = generated('BTC', etf_holdings=True)

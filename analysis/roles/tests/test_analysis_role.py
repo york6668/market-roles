@@ -100,11 +100,11 @@ class AnalysisRoleTests(unittest.TestCase):
                 p.start(); self.addCleanup(p.stop)
         self.seed_reader()
 
-    def seed_reader(self, holdings_only=False, start_id=100, flows=False):
+    def seed_reader(self, holdings_only=False, start_id=100, flows=False, flow_venue='TFTC'):
         updates, documents = [], {}
         for index, asset in enumerate(('BTC','QQQ','VOO')):
             parent = start_id + index * 2
-            bundle, text = generated(asset, etf_holdings=holdings_only, etf_flows=flows)
+            bundle, text = generated(asset, etf_holdings=holdings_only, etf_flows=flows, flow_venue=flow_venue)
             raw = btc_evidence.encode_bundle(bundle); documents[str(parent)] = raw
             chat = {'id': -100123, 'type': 'channel'}
             updates.extend([
@@ -131,19 +131,19 @@ class AnalysisRoleTests(unittest.TestCase):
         self.assertEqual('Bitbo', btc['sources']['public_etf']['venue'])
         self.assertNotIn('public_etf_history', btc['sources'])
 
-    def test_tftc_windows_reach_default_actual_core_collector_entry(self):
-        self.seed_reader(flows=True, start_id=1200)
-        captured = collector.capture(self.project)
-        collector.validate(captured)
-        btc = captured['assets']['BTC']
-        self.assertEqual('AUXILIARY', btc['status'])
-        values = btc['datasets']['etf']['values']
-        self.assertAlmostEqual(1.01234567, values['flow_1d_usd'])
-        self.assertAlmostEqual(5.06172835, values['flow_5d_usd'])
-        self.assertAlmostEqual(30.3703701, values['flow_30d_usd'])
-        self.assertAlmostEqual(12.00000012, values['holdings_btc'])
-        self.assertEqual('TFTC', btc['sources']['public_etf_history']['venue'])
-        self.assertEqual('Bitbo', btc['sources']['public_etf']['venue'])
+    def test_anonymous_windows_reach_default_actual_core_collector_entry(self):
+        for index, (venue, daily) in enumerate([('TFTC', 1.01234567), ('CoinBoss', 1200000)]):
+            self.seed_reader(flows=True, start_id=1200 + 100 * index, flow_venue=venue)
+            captured = collector.capture(self.project)
+            collector.validate(captured)
+            btc = captured['assets']['BTC']
+            self.assertEqual('AUXILIARY', btc['status'])
+            values = btc['datasets']['etf']['values']
+            for days in (1, 5, 30):
+                self.assertAlmostEqual(daily * days, values['flow_%dd_usd' % days])
+            self.assertAlmostEqual(12.00000012, values['holdings_btc'])
+            self.assertEqual(venue, btc['sources']['public_etf_history']['venue'])
+            self.assertEqual('Bitbo', btc['sources']['public_etf']['venue'])
 
     def native(self, *args):
         buffer = io.StringIO()
