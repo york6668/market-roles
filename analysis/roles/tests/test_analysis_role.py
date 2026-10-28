@@ -236,14 +236,28 @@ class AnalysisRoleTests(unittest.TestCase):
         self.assertTrue((root / 'current').is_symlink())
         self.assertEqual(storage.current(root)['assessment']['revision'], 5)
 
-    def test_reader_candidate_keeps_minute10_without_model_scheduler(self):
+    def test_reader_candidate_uses_node_minute_without_model_scheduler(self):
+        self.value['reader_minute'] = 37
+        self.config.write_text(json.dumps(self.value))
         destination = self.base / 'reader.plist'
         analysis_role.render_reader(self.config, destination)
         import plistlib
         value = plistlib.loads(destination.read_bytes())
-        self.assertEqual(value['StartCalendarInterval'], {'Minute': 10})
+        self.assertEqual(value['StartCalendarInterval'], {'Minute': 37})
         self.assertNotIn('RunAtLoad', value); self.assertNotIn('KeepAlive', value)
         self.assertNotIn('strategy_v4.py', json.dumps(value))
+
+    def test_reader_candidate_rejects_missing_or_invalid_schedule_before_writing(self):
+        destination = self.base / 'reader.plist'
+        for minute in (None, True, '10', -1, 60):
+            value = dict(self.value)
+            value.pop('reader_minute')
+            if minute is not None:
+                value['reader_minute'] = minute
+            self.config.write_text(json.dumps(value))
+            with self.subTest(minute=minute), self.assertRaisesRegex(ValueError, 'reader_minute'):
+                analysis_role.render_reader(self.config, destination)
+            self.assertFalse(destination.exists())
 
     def test_state_wal_and_absolute_internal_links_restore_to_new_root(self):
         root = self.base / 'small'; root.mkdir()

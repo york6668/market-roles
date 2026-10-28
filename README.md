@@ -1,6 +1,6 @@
 # market-roles
 
-采集与分析角色的统一源码。GitHub 私有仓库为 `york6668/market-roles`；新版 Codex 云端环境为 `market-roles`。云端用于代码维护和离线测试，两台 Mac mini 独立运行正式服务。
+采集与分析角色的统一源码。GitHub 源码仓库为 `york6668/market-roles`。Codex 执行环境按当前工作站入口发现；代码维护和离线测试与正式节点执行分别核验。
 
 ## 入口
 
@@ -40,7 +40,7 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 
 本文测试和导出命令在仓库检出目录执行；导出目录中的单角色入口分别为 `roles/offline_tests.py` 和分析部署说明中的命令。
 
-使用 HTTPS 获取私有仓库，在目标机器检出已验证并指定的完整提交。不要直接运行来源不明的最新分支，也不要把云端工作区未提交文件当作发布版本。角色部署仅在目标机器的 Codex 会话内进行；不提供跨机器调度或一键部署。
+使用 HTTPS 获取仓库，在目标机器检出已验证并指定的完整提交。不要直接运行来源不明的最新分支，也不要把云端工作区未提交文件当作发布版本。角色部署仅在目标机器的 Codex 会话内进行；不提供跨机器调度或一键部署。
 
 程序和配置可以从源码恢复；历史、游标、策略基线、待办及回执只能从对应机器的一致性备份恢复。云端、Git 和源码包都不保存真实业务运行状态。
 
@@ -50,7 +50,7 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 
 ## 独立核心版本
 
-完整策略、Skill、研究嗅探、状态、报告与恢复由私有仓库 `york6668/btc-core-strategy` 维护。本仓库以 `core/btc-core-strategy` submodule 固定提交；采集与 reader 仍由本仓库维护。
+完整策略、Skill、研究嗅探、状态、报告与恢复由仓库 `york6668/btc-core-strategy` 维护。本仓库以 `core/btc-core-strategy` submodule 固定提交；采集与 reader 仍由本仓库维护。
 
 运行 `git submodule update --init core/btc-core-strategy` 取得核心。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后运行 `python3 roles/validate_repository.py --role all`，包含完整核心与实际 reader 组合验证。云端仅作离线验证，模型、采集、发送、事实与数据仍在本机。
 

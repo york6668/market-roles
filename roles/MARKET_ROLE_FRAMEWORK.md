@@ -2,16 +2,11 @@
 
 框架版本：2026.10.01.2；部署代码以 Git 指定提交为准。
 
-「投资-btc」项目维护角色概览、策略资料和发布版本入口；私有 GitHub 仓库 `york6668/market-roles` 集中维护完整源码、工程框架、业务契约及测试。新版 Codex 云端环境 `market-roles` 用于开发和离线验证。程序、定时任务、数据和业务运行上下文落实在承担角色的机器上。云端项目用于工程维护与重建，不参与每轮本地定时执行。本框架不提供跨机器一键部署、自动接管、SSH 或 MCP 调度服务。
+「投资-btc」项目维护角色概览、策略资料和发布版本入口；GitHub 源码仓库 `york6668/market-roles` 集中维护完整源码、工程框架、业务契约及测试。Codex 执行环境按当前工作站入口发现，用于开发和离线验证。程序、定时任务、数据和业务运行上下文落实在承担角色的机器上。云端项目用于工程维护与重建，不参与每轮本地定时执行。本框架不提供跨机器一键部署、自动接管、SSH 或 MCP 调度服务。
 
-## 角色与历史初始绑定
+## 角色与节点绑定
 
-| 角色 | 初始机器标识 | 初始程序与状态位置 | 初始运行方式 |
-| --- | --- | --- | --- |
-| collector | Mac-mini.local | `/Users/york/scripts/btc_push.py`；`~/.btc_push_state_tokyo.json` 及其相关 JSON、SQLite | 现有 `com.york.btcpush` LaunchAgent 常驻；采集线程持续运行，内部按小时调度 |
-| analysis | yorkdeMac-mini.local | reader 实际运行于 `~/Library/Application Support/btc-telegram-reader/app`；策略上下文位于 `/Users/york/Documents/ChatGPT/btc`，策略入口为 `btc-core-strategy/scripts/strategy_v4.py` | 原 reader 每小时第 10 分钟同步；Codex 本地小时分析任务 |
-
-本表保留容器迁移前的角色来源，不表示当前加载路径、版本或服务状态。当前事实由目标节点配置、固定发布目录、容器镜像与实际挂载核对。机器名称用于识别，不能从名称推断在线状态；`.local` 仅是有条件的发现入口。角色可以换机，也可以同机承担多个角色。analysis 的部署路径和测试入口见 [分析部署说明](../analysis/roles/ANALYSIS_DEPLOYMENT.md)。
+collector 与 analysis 是职责，不固定机器。目标节点通过原配置提供机器身份、源码版本、状态位置、服务标签及调度；可以换机，也可以同机承担多个角色。真实绑定、历史部署记录和备份留在原工作站，不放进源码或配置模板。分析部署入口见[分析部署说明](../analysis/roles/ANALYSIS_DEPLOYMENT.md)。
 
 采集角色负责公开数据、必要的机械指标计算、历史与质量记录、现有行情简报及证据附件。分析角色负责证据摄取和独立来源核验、市场判断、组合分析、报告及后续条件。采集程序不因角色整理新增策略决定或资产操作。
 
@@ -58,7 +53,7 @@ python3 /ABS/new-code/roles/role_support.py status --config /ABS/collector.json
 
 保留当前正常运行的 LaunchAgent。框架更新和打包本身不重启服务。新目录先做离线检查和预览，通过后才切换。安装使用目标机器自己的 Codex 会话；不能在本机用路径相同就误操作另一台机器。
 
-collector 候选 plist 经 `plutil -lint /ABS/collector.plist` 检查后，先用 `launchctl print gui/$(id -u)/com.york.btcpush` 确认当前实例。需要替换时保存旧 plist，停止旧服务，确保旧进程退出及写入锁已释放，再安装新 plist 到该用户的 `Library/LaunchAgents` 并用 `launchctl bootstrap gui/$(id -u) /ABS/installed.plist` 启动。新机器使用配置中的实际标签；同一正式角色不能保留两个活动实例。
+collector 候选 plist 经 `plutil -lint /ABS/collector.plist` 检查后，先用 `launchctl print gui/$(id -u)/<配置中的服务标签>` 确认当前实例。需要替换时保存旧 plist，停止旧服务，确保旧进程退出及写入锁已释放，再安装新 plist 到该用户的 `Library/LaunchAgents` 并用 `launchctl bootstrap gui/$(id -u) /ABS/installed.plist` 启动。新机器使用配置中的实际标签；同一正式角色不能保留两个活动实例。
 
 analysis 继续由 reader 服务和 Codex 本地自动任务分别负责摄取及分析。保留现有小时计划、提示词、模型分工和报告目的地。新机的 Codex 自动任务通过应用的自动任务工具/界面配置，不手写平台内部 automation.toml，也不把模型任务伪装为 launchd shell 脚本。
 
@@ -66,7 +61,7 @@ analysis 继续由 reader 服务和 Codex 本地自动任务分别负责摄取�
 
 ## 业务状态与上下文恢复
 
-collector 的恢复集合包括 BTC/QQQ/VOO 主 JSON、liquidation 与 Hyperliquid 侧车、delivery SQLite 和 market history SQLite；COMMON 快照、去重信息和调度记录在 delivery 库中。`collector.example.json` 已列出默认路径。实际状态里的历史归档引用如果仍会被读取，需把对应归档纳入恢复集合并保留可解析路径；不能只复制主 JSON。
+collector 的恢复集合包括 BTC/QQQ/VOO 主 JSON、liquidation 与 Hyperliquid 侧车、delivery SQLite 和 market history SQLite；COMMON 快照、去重信息和调度记录在 delivery 库中。`collector.example.json` 仅展示逻辑状态名和占位路径；实际位置取自节点配置。实际状态里的历史归档引用如果仍会被读取，需把对应归档纳入恢复集合并保留可解析路径；不能只复制主 JSON。
 
 analysis 的恢复集合由实际部署说明列出，至少包括 reader 数据库与消费游标、证据库、策略当前基线及历史、已采纳报告、待办条件、投递状态和本地事实。运行上下文从明确的数据文件恢复；不要复制用户认证、浏览器配置或整个 Codex 主目录。Codex 聊天历史可辅助理解，但不能成为唯一运行状态来源。
 

@@ -1,35 +1,37 @@
 {
   "role": "analysis",
-  "machine": "yorkdeMac-mini.local",
-  "python": "/usr/bin/python3",
-  "code_dir": "/Users/york/Documents/ChatGPT/btc",
+  "machine": "analysis-host",
+  "python": "/absolute/python3",
+  "code_dir": "/absolute/analysis-project",
   "entrypoint": "telegram_reader/reader.py",
-  "arguments": ["sync"],
-  "service_label": "local.btc.telegram-reader",
-  "reader_minute": 10,
-  "log_dir": "/Users/york/Library/Logs",
-  "reader_stdout": "/Users/york/Library/Logs/btc-telegram-reader.log",
-  "reader_stderr": "/Users/york/Library/Logs/btc-telegram-reader.error.log",
-  "project_dir": "/Users/york/Documents/ChatGPT/btc",
-  "skill_dir": "/Users/york/.agents/skills/btc-core-strategy",
-  "reader_data_dir": "/Users/york/Library/Application Support/btc-telegram-reader/app/data",
-  "reader_evidence_path": "/Users/york/Library/Application Support/btc-telegram-reader/策略证据.md",
-  "frozen_market_python": "/Users/york/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-  "automation_id": "btc",
+  "arguments": [
+    "sync"
+  ],
+  "service_label": "local.example.market-reader",
+  "reader_minute": null,
+  "log_dir": "/absolute/local-reader/logs",
+  "reader_stdout": "/absolute/local-reader/logs/btc-telegram-reader.log",
+  "reader_stderr": "/absolute/local-reader/logs/btc-telegram-reader.error.log",
+  "project_dir": "/absolute/analysis-project",
+  "skill_dir": "/absolute/release/skill/btc-core-strategy",
+  "reader_data_dir": "/absolute/local-reader/app/data",
+  "reader_evidence_path": "/absolute/local-reader/策略证据.md",
+  "frozen_market_python": "/absolute/persistent-runtime/bin/python3",
+  "automation_id": "EXISTING_LOCAL_AUTOMATION_ID",
   "environment": {},
   "state_paths": {
-    "strategy": "/Users/york/Documents/ChatGPT/btc/.strategy",
-    "reader_data": "/Users/york/Library/Application Support/btc-telegram-reader/app/data",
-    "reader_evidence": "/Users/york/Library/Application Support/btc-telegram-reader/策略证据.md",
-    "asset_facts": "/Users/york/Documents/ChatGPT/btc/资产配置.md",
-    "operations": "/Users/york/Documents/ChatGPT/btc/操作记录.md",
-    "corrections": "/Users/york/Documents/ChatGPT/btc/纠正记录.md",
-    "factor_guide": "/Users/york/Documents/ChatGPT/btc/价值因子.md",
-    "automation_memory": "/Users/york/.codex/automations/btc/memory.md",
-    "automation_history": "/Users/york/.codex/automations/btc/history"
+    "strategy": "/absolute/analysis-project/.strategy",
+    "reader_data": "/absolute/local-reader/app/data",
+    "reader_evidence": "/absolute/local-reader/策略证据.md",
+    "asset_facts": "/absolute/analysis-project/资产配置.md",
+    "operations": "/absolute/analysis-project/操作记录.md",
+    "corrections": "/absolute/analysis-project/纠正记录.md",
+    "factor_guide": "/absolute/analysis-project/价值因子.md",
+    "automation_memory": "/absolute/local-automation/memory.md",
+    "automation_history": "/absolute/local-automation/history"
   },
   "writer_locks": [
-    "/Users/york/Library/Application Support/btc-telegram-reader/app/data/reader.lock",
-    "/Users/york/Documents/ChatGPT/btc/.strategy/v4/.writer.lock"
+    "/absolute/local-reader/app/data/reader.lock",
+    "/absolute/analysis-project/.strategy/v4/.writer.lock"
   ]
 }

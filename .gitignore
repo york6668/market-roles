@@ -8,3 +8,10 @@ __pycache__/
 
 /tests/fixtures/
 /analysis/telegram_reader/tests/fixtures/
+
+# Node configuration and runtime output stay outside source control.
+.local/
+*.local.json
+.strategy/
+/analysis/telegram_reader/data/
+/analysis/telegram_reader/migration-backups/

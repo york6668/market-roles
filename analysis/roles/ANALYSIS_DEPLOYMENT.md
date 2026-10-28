@@ -1,6 +1,6 @@
 # 分析角色：本地部署与恢复
 
-框架版本 `2026.10.01.2`，代码以私有仓库 `york6668/market-roles` 的指定提交为准。新版 Codex 云端环境用于开发和离线验证。本地机器拥有数据、游标、证据、策略、研究上下文、投递状态、资产事实和登录。初始分析机为 `yorkdeMac-mini.local`；采集机绑定由采集角色另行维护。
+框架版本 `2026.10.01.2`，代码以源码仓库 `york6668/market-roles` 的指定提交为准。新版 Codex 云端环境用于开发和离线验证。本地机器拥有数据、游标、证据、策略、研究上下文、投递状态、资产事实和登录。机器身份及现行绑定从目标节点原入口发现；采集机绑定由采集角色另行维护。
 
 ## 当前运行位置与历史布局
 
@@ -12,7 +12,7 @@ Docker 节点通过宿主版本入口固定核心版本，reader 使用角色提
 
 ## 参考源码与本机配置
 
-`analysis-contract.json` 不包含机器路径。`machine-analysis.example.json` 是本机路径示例，没有凭据值。重建时修改自己的机器配置；`project_dir`、`skill_dir`、reader 数据与证据位置相互独立。`python` 用于本机工具及 reader 候选服务，可选择已安装 keyring 的 reader venv；策略生产入口使用节点选定的解释器或 Docker 转发入口。不同 Python 的浮点求和不能改写冻结原始字节，需要兼容时在 `frozen_market_python` 指向节点持久管理的解释器，并以 `frozen_market_python_version` 固定已验证版本。
+`analysis-contract.json` 不包含机器路径。`machine-analysis.example.json` 仅含占位路径和配置字段，不是实际机器配置。`reader_minute` 必须填写节点已确认的小时内分钟数；示例中的 null 不能直接用于部署。重建时修改自己的机器配置；`project_dir`、`skill_dir`、reader 数据与证据位置相互独立。`python` 用于本机工具及 reader 候选服务，可选择已安装 keyring 的 reader venv；策略生产入口使用节点选定的解释器或 Docker 转发入口。不同 Python 的浮点求和不能改写冻结原始字节，需要兼容时在 `frozen_market_python` 指向节点持久管理的解释器，并以 `frozen_market_python_version` 固定已验证版本。
 
 参考 JSON 格式为 `market-role-source-v1`，`role=analysis`。源码按显式文件表选择；排除 `.strategy`、数据库、日志、真实市场附件、个人事实文件、凭据、Codex 登录、自动任务 memory/history、旧真实报告 fixture 和 rollback 资料。合成测试状态由 `roles/generate_synthetic.py` 调用核心构造程序在临时目录生成，不随源码保存或导出。
 
@@ -43,7 +43,7 @@ reader 需要本机 Python 3.9+ 和 `keyring==25.7.0`。原机器 venv 直接复
 /usr/bin/python3 roles/analysis_role.py --config /absolute/machine.json render-reader /absolute/candidate.plist
 ```
 
-候选保留每小时第 10 分钟，不增加 `RunAtLoad`/`KeepAlive`。helper 运行 reader；候选中只有路径变量，不嵌入 token。通过 `launchctl bootstrap gui/<uid> <plist>` 安装 reader，原服务回滚使用保存的原 plist 和原代码。修改既有机器时只替换确有变化的运行模块，保留原 plist、venv、数据、Keychain 和项目链接；等待下一次自然运行，不额外真实推送。
+候选使用本机配置明确提供的 `reader_minute`，不增加 `RunAtLoad`/`KeepAlive`。helper 运行 reader；候选中只有路径变量，不嵌入 token。通过 `launchctl bootstrap gui/<uid> <plist>` 安装 reader，原服务回滚使用保存的原 plist 和原代码。修改既有机器时只替换确有变化的运行模块，保留原 plist、venv、数据、Keychain 和项目链接；等待下一次自然运行，不额外真实推送。
 
 Codex 分析继续用原本地小时任务和原云端报告目的地。源码文件、普通 launchd 或 Python 不构成一个模型分析自动任务。沿用 Sol/high 与 Skill 内 Astra/max 分工。任务查询、暂停、恢复和路径调整通过 Codex 的原生任务工具或界面；禁止手写/改写 `automation.toml`。恢复时保留原 prompt、频率、模型、推理强度、项目和仅失败通知设置，不创建第二个 BTC 主任务，也不修改独立重大事件任务。新机器须先完成本机 Codex 登录、项目与目的地选择；静态参考包不能恢复这些登录和会话权限。[OpenAI 官方调度说明](https://learn.chatgpt.com/docs/automations?surface=app)也要求涉及本地文件时保持机器和应用运行。
 
