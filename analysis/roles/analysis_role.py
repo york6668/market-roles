@@ -17,8 +17,9 @@ def machine_config(path):
         raise ValueError('analysis machine configuration required')
     for key in ('project_dir', 'skill_dir', 'reader_data_dir', 'reader_evidence_path'):
         role_support.local_path(value[key])
-    if not 0 <= value.get('reader_minute', 10) <= 59:
-        raise ValueError('reader_minute must be within the hour')
+    minute = value.get('reader_minute')
+    if type(minute) is not int or not 0 <= minute <= 59:
+        raise ValueError('reader_minute must be explicitly configured as an integer from 0 to 59')
     return value
 
 
@@ -61,7 +62,7 @@ def render_reader(config_path, destination):
     candidate = plistlib.loads(path.read_bytes())
     for key in ('RunAtLoad', 'KeepAlive', 'StartInterval'):
         candidate.pop(key, None)
-    candidate['StartCalendarInterval'] = {'Minute': value.get('reader_minute', 10)}
+    candidate['StartCalendarInterval'] = {'Minute': value['reader_minute']}
     candidate['EnvironmentVariables'] = dict(value.get('environment', {}),
         BTC_READER_DATA_DIR=value['reader_data_dir'], BTC_READER_EVIDENCE_PATH=value['reader_evidence_path'])
     candidate['StandardOutPath'] = value.get('reader_stdout', candidate['StandardOutPath'])
