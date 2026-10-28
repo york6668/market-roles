@@ -52,9 +52,17 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 
 完整策略、Skill、研究嗅探、状态、报告与恢复由仓库 `york6668/btc-core-strategy` 维护。本仓库以 `core/btc-core-strategy` submodule 固定提交；采集与 reader 仍由本仓库维护。
 
-运行 `git submodule update --init core/btc-core-strategy` 取得核心。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后运行 `python3 roles/validate_repository.py --role all`，包含完整核心与实际 reader 组合验证。云端仅作离线验证，模型、采集、发送、事实与数据仍在本机。
+运行 `git submodule update --init core/btc-core-strategy` 取得核心。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后运行 `python3 roles/validate_repository.py --role all`，包含完整核心与实际 reader 组合验证。云端工程环境用于离线验证；正式执行入口与运行数据由获准节点承载。本机执行不等于模型计算或材料处理仅在设备内，进入模型会话的内容及工具回传仍按现有授权和数据范围控制。
 
 核心候选新入口使用 content revision 9，在既有 Owner 中完成投资者政策、独立市场、组合风险与机会的总体取舍，并按实际版本交给报告和后续复核。生产采用版本由节点 current 实际指针确认；源码候选不等于已采用。风险结论可以独立成立，需要应对时再附建议；原有机会分析继续保留。旧正式状态、在办研究及 UNKNOWN 投递保留原身份，旧配置建议不自动解释为新风险评估。
+
+## 固定来源与角色组合
+
+源码身份以本次检出的完整提交为准，同时核对该提交的 `roles/source-map.json`、`core/` gitlink 和核心 `export-manifest.json`。默认分支、CI 快照、另一角色版本及节点已安装目录不能互相代替；`.gitmodules` 的 `branch` 字段也不能替代 gitlink 固定提交。
+
+本提交的采集映射取自仓库根目录。选择含 `core/market-collector` 的其他角色提交时，采集及共享证据文件按该提交的映射和 collector gitlink 取源；不能把本 README 的目录布局套到另一固定版本。可用 `git ls-tree HEAD core/btc-core-strategy core/market-collector` 核对实际存在的依赖，仅初始化本提交已声明的 submodule，不用 `--remote` 隐式升级。
+
+分析导出组合角色文件表与固定核心的导出清单，运行时配置与模型阅读的 Markdown 另有职责。导出候选应保留角色、依赖提交和文件身份；来源相同且验证适用的现有候选可复用。导出成功、独立核对、实际安装及运行采用分别确认，不能手工改写已冻结发布目录后继续声称原来源身份，也不能因 Reader 文档修正顺带切换节点核心。
 
 ## Docker 节点
 
