@@ -122,6 +122,7 @@
     "roles/containers/reader_bridge.py": "roles/containers/reader_bridge.py",
     "roles/containers/prepare_collector.py": "roles/containers/prepare_collector.py",
     "telegram_reader/seller_exhaustion.py": "seller_exhaustion.py",
+    "telegram_reader/mappings/binance_markets.md": "core/market-collector/mappings/binance_markets.md",
     "telegram_reader/mappings/glassnode_seller_exhaustion.md": "mappings/glassnode_seller_exhaustion.md",
     "telegram_reader/btc_etf.py": "core/market-collector/btc_etf.py",
     "telegram_reader/btc_etf_flow.py": "core/market-collector/btc_etf_flow.py",
