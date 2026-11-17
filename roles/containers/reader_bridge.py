@@ -79,6 +79,14 @@ def main():
                '-f', docker['compose_file']]
     for override in docker.get('override_files', []):
         command += ['-f', override]
+    backend = docker.get('reader_backend')
+    if backend == 'MYSQL_V1':
+        result = subprocess.run(command + ['--profile', 'analysis', 'exec', '-T',
+                                            'core', 'python', '-m', 'btc_node', 'reader-poll'],
+                                input=CredentialVault().bot_token() + '\n', text=True)
+        return result.returncode
+    if backend is not None:
+        raise ValueError('unrecognized Docker reader backend')
     # getUpdates acknowledges the previous cursor. Persist that state before
     # the one polling request, and persist the new cursor before returning.
     checkpoint(command, 'BEFORE_POLL')
