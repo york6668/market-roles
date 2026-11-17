@@ -103,14 +103,26 @@ def package(root, files, destination, role):
             raise ValueError("source is outside the reference root")
         if any(part in (".strategy", ".git", "__pycache__", "node_modules") for part in relative.parts):
             raise ValueError("runtime data cannot be a source reference")
-        if source.suffix not in (".py", ".md", ".txt", ".json", ".sh", ".yaml", ".yml") and source.name not in ('Dockerfile', '.dockerignore', '.gitignore'):
-            raise ValueError("unsupported source reference type")
+        # The existing source mapping owns package membership; a language's
+        # suffix is not a second source contract. This format carries UTF-8 text.
         contents[name] = source.read_text(encoding="utf-8")
     if not contents:
         raise ValueError("empty source reference")
     write_json(destination, {"format": "market-role-source-v1", "version": VERSION,
                              "role": role, "files": contents})
     return {"role": role, "files": len(contents), "path": str(destination)}
+
+
+def validate_source(root, python=sys.executable):
+    """Parse packaged Python without executing it or claiming behavior coverage."""
+    root = Path(root).resolve()
+    sources = sorted(str(path.relative_to(root)) for path in root.rglob('*.py')
+                     if path.is_file())
+    command = ('import ast,sys; from pathlib import Path; '
+               '[ast.parse(Path(p).read_bytes(), filename=p) for p in sys.argv[1:]]')
+    subprocess.run([python, '-B', '-c', command, *sources], cwd=root, check=True)
+    return {'validation': 'PYTHON_SYNTAX', 'python_files': len(sources),
+            'behavior_validation': 'NOT_RUN', 'exit_code': 0}
 
 
 def unpack(source, destination):

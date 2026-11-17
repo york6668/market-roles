@@ -14,7 +14,7 @@ Docker 节点通过宿主版本入口固定核心版本，reader 使用角色提
 
 `analysis-contract.json` 不包含机器路径。`machine-analysis.example.json` 仅含占位路径和配置字段，不是实际机器配置。`reader_minute` 必须填写节点已确认的小时内分钟数；示例中的 null 不能直接用于部署。重建时修改自己的机器配置；`project_dir`、`skill_dir`、reader 数据与证据位置相互独立。`python` 用于本机工具及 reader 候选服务，可选择已安装 keyring 的 reader venv；策略生产入口使用节点选定的解释器或 Docker 转发入口。不同 Python 的浮点求和不能改写冻结原始字节，需要兼容时在 `frozen_market_python` 指向节点持久管理的解释器，并以 `frozen_market_python_version` 固定已验证版本。
 
-参考 JSON 格式为 `market-role-source-v1`，`role=analysis`。源码按显式文件表选择；排除 `.strategy`、数据库、日志、真实市场附件、个人事实文件、凭据、Codex 登录、自动任务 memory/history、旧真实报告 fixture 和 rollback 资料。合成测试状态由 `roles/generate_synthetic.py` 调用核心构造程序在临时目录生成，不随源码保存或导出。
+参考 JSON 格式为 `market-role-source-v1`，`role=analysis`。源码按显式文件表选择；排除 `.strategy`、数据库、日志、真实市场附件、个人事实文件、凭据、Codex 登录、自动任务 memory/history、旧真实报告 fixture 和 rollback 资料。验证所需合成状态及其构造程序由当前任务在临时位置准备，不随正式源码保存、导出或成为安装依赖。
 
 先核对所选角色完整提交及其来源组合：文件映射以该源码提交的 `roles/source-map.json` 为准，核心与共享证据沿该提交已有 gitlink 及核心 `export-manifest.json` 确认。优先复用来源相同且已有适用验证的候选；缺少时才从指定 Git 提交正常导出到新目录。导出不安装服务、不开始分析或发送，也不自动决定独立部署的节点核心版本：
 
@@ -45,7 +45,7 @@ reader 需要本机 Python 3.9+ 和 `keyring==25.7.0`。原机器 venv 直接复
 
 候选使用本机配置明确提供的 `reader_minute`，不增加 `RunAtLoad`/`KeepAlive`。helper 运行 reader；候选中只有路径变量，不嵌入 token。通过 `launchctl bootstrap gui/<uid> <plist>` 安装 reader，原服务回滚使用保存的原 plist 和原代码。修改既有机器时只替换确有变化的运行模块，保留原 plist、venv、数据、Keychain 和项目链接；等待下一次自然运行，不额外真实推送。
 
-Codex 分析继续用原本地小时任务和原云端报告目的地。源码文件、普通 launchd 或 Python 不构成一个模型分析自动任务。沿用 Sol/high 与 Skill 内 Astra/max 分工。任务查询、暂停、恢复和路径调整通过 Codex 的原生任务工具或界面；禁止手写/改写 `automation.toml`。恢复时保留原 prompt、频率、模型、推理强度、项目和仅失败通知设置，不创建第二个 BTC 主任务，也不修改独立重大事件任务。新机器须先完成本机 Codex 登录、项目与目的地选择；静态参考包不能恢复这些登录和会话权限。[OpenAI 官方调度说明](https://learn.chatgpt.com/docs/automations?surface=app)也要求涉及本地文件时保持机器和应用运行。
+Codex 分析沿当前有效职责和原计划任务入口承接，报告目的地按仍有效的用户要求核实。源码文件、普通 launchd 或 Python 不构成模型分析自动任务。任务查询、暂停、恢复和路径调整通过 Codex 的原生任务工具或界面；禁止手写/改写 `automation.toml`。恢复时按当前有效要求核对仍适用的调度、项目、目的地及通知设置，不创建第二个 BTC 主任务，也不修改独立重大事件任务。新机器须先完成本机 Codex 登录、项目与目的地选择；静态参考包不能恢复这些登录和会话权限。[OpenAI 官方调度说明](https://learn.chatgpt.com/docs/automations?surface=app)也要求涉及本地文件时保持机器和应用运行。
 
 ## 完整状态恢复集合
 
@@ -98,11 +98,11 @@ helper 保留状态根内部链接并将绝对内部链接规范为相对链接�
 
 修复让每个标的最新报告的待下载附件优先进入同一个 20 件有界预算，其余待办保留并继续按原顺序处理；失败重试时间不绕过，来源质量不放宽。reader gap 导出含正文/附件身份和下载状态，策略冻结保留必要 report/bundle/transport 身份，排除 file_id、chat_id、采集 prose；身份不能提升事实可信度。VOO 的代理关系、UNKNOWN 复权与质量缺口不修成可分析。
 
-离线验收使用合成数据和临时目录，禁真实网络、凭据、发送和生产调度。通过参考包解包后运行 `roles/verify_analysis_reference.py`；它分别验证 reader、身份冻结和真实策略入口，包含 revision 7 market→observe 与 revision 5 正式状态保留、同一观察恢复、SQLite/WAL、内部链接、游标、研究待办和 PENDING/UNKNOWN/DELIVERED 保留。组合验证另运行导出的完整核心测试，覆盖 revision 7 的独立风险结果、可选建议、原有机会分析及报告绑定。结果只证明源码与恢复接口；实际模型判断、真实发送、云端发布和自然小时运行各自需要实际证据。
+源码参考包可由 `roles/verify_analysis_reference.py` 解包，核给定格式、路径和 Python 语法；它不执行包内测试或确认完整业务行为。行为验收由当前任务从有效契约和实际 reader/核心组合选择临时输入与验证，按本次范围隔离网络、凭据、发送和生产调度。涉及恢复时核真实状态、游标、研究与投递身份；实际模型判断、发送、环境发布及自然调度分别需要实际证据，旧案例不形成永久入口。
 
 ## 独立核心发布
 
-核心版本由 `core/btc-core-strategy` 的 Git 提交确定。使用核心的 `scripts/release.py` 与本机节点配置安装，正式模板见核心 `tasks/hourly.md`，恢复方式见 Skill 的 `references/releases.md`。Skill、代码、方法和测试一起发布，不单独复制 Skill 文件夹。旧 `build_analysis_reference.py` 仍可生成角色源码包，但改从本仓库及固定 submodule 导出，不读取资产项目中的核心副本。
+核心版本由 `core/btc-core-strategy` 的 Git 提交确定。使用核心的 `scripts/release.py` 与本机节点配置安装，正式模板见核心 `tasks/hourly.md`，恢复方式见 Skill 的 `references/releases.md`。Skill、正式代码与方法同版发布，不单独复制 Skill 文件夹；测试材料按项目临时生命周期管理，不纳入源码包或安装条件。旧 `build_analysis_reference.py` 仍可生成角色源码包，但改从本仓库及固定 submodule 导出，不读取资产项目中的核心副本。
 
 ## 投资决策候选与采用
 

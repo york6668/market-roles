@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Unpack an analysis source reference and run its isolated native tests."""
+"""Check an analysis source reference's format, paths and Python syntax."""
 import argparse
 import json
 from pathlib import Path
-import subprocess
 import sys
 import tempfile
 
@@ -21,17 +20,11 @@ def main():
     with tempfile.TemporaryDirectory(prefix='btc-analysis-reference-') as directory:
         root = Path(directory) / 'reference'
         unpacked = role_support.unpack(args.reference, root)
-        results = []
-        for name in ('telegram_reader/run_offline_tests.py', 'roles/run_isolated_tests.py'):
-            process = subprocess.run([args.python, '-B', str(root / name)], cwd=root,
-                text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print(process.stdout, end='')
-            print(process.stderr, end='', file=sys.stderr)
-            results.append({'entrypoint': name, 'exit_code': process.returncode})
+        checked = role_support.validate_source(root, args.python)
         result = {'format': data['format'], 'role': data['role'], 'version': data['version'],
-                  'files': unpacked['files'], 'tests': results}
+                  'files': unpacked['files'], 'source_check': checked}
         print('ANALYSIS_REFERENCE_VERIFIED=' + json.dumps(result, sort_keys=True))
-        return 0 if all(row['exit_code'] == 0 for row in results) else 1
+        return checked['exit_code']
 
 
 if __name__ == '__main__':
