@@ -54,7 +54,7 @@ python3 -B roles/export_role.py analysis /absolute/new/analysis-source
 
 运行 `git submodule update --init core/btc-core-strategy` 取得核心。分析导出组合 reader/角色的 `roles/source-map.json` 与核心自己的 `export-manifest.json`，不重复维护核心文件清单。核心升级后可运行 `python3 roles/validate_repository.py --role all` 核完整组合的导出与语法，再针对变化的真实 reader/核心接口作临时行为验证；源码检查不能签组合行为通过。云端工程环境用于离线验证；正式执行入口与运行数据由获准节点承载。本机执行不等于模型计算或材料处理仅在设备内，进入模型会话的内容及工具回传仍按现有授权和数据范围控制。
 
-核心候选新入口使用 content revision 9，在既有 Owner 中完成投资者政策、独立市场、组合风险与机会的总体取舍，并按实际版本交给报告和后续复核。生产采用版本由节点 current 实际指针确认；源码候选不等于已采用。风险结论可以独立成立，需要应对时再附建议；原有机会分析继续保留。旧正式状态、在办研究及 UNKNOWN 投递保留原身份，旧配置建议不自动解释为新风险评估。
+分析角色沿当前源码提交所固定的核心入口运行。可读格式取自该核心发布清单，实际评估、组合决定和报告格式由本轮入口返回。各组依据当期有效配置完成决定，结果沿原报告与复核流程消费。生产采用以节点和原运行的实际绑定核验。历史决定、在办研究及 UNKNOWN 投递沿其原身份处理。
 
 ## 固定来源与角色组合
 
